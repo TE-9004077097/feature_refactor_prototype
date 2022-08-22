@@ -1,0 +1,293 @@
+add_subdirectory(thumbnail)
+
+list(APPEND preset_manager_entry_dependencies preset_manager)
+list(APPEND preset_manager_entry_dependencies preset_status_if)
+list(APPEND preset_manager_entry_dependencies camera_osd_status_if)
+list(APPEND preset_manager_entry_dependencies op_device_status_if)
+list(APPEND preset_manager_entry_dependencies preset_manager_ptz_trace_controller)
+list(APPEND preset_manager_entry_dependencies ptz_trace_if)
+list(APPEND preset_manager_entry_dependencies ptz_trace_status_if)
+list(APPEND preset_manager_entry_dependencies common_core)
+list(APPEND preset_manager_entry_dependencies preset_capability_infra_if)
+list(APPEND preset_manager_entry_dependencies power_status_if)
+list(APPEND preset_manager_entry_dependencies bizglobal)
+list(APPEND preset_manager_entry_dependencies thumbnail)
+list(APPEND preset_manager_entry_dependencies preset_infra_entry)
+
+cxx_static_library(preset_manager_entry
+  "${preset_manager_entry_dependencies}"
+  preset_manager_entry.cpp
+  preset_manager_message_handler.cpp
+  power_status_event_listener_preset.cpp
+  preset_manager_backup_reset_on_uud_listener.cpp
+  preset_manager_trace_if.cpp
+  preset_thumbnail_controller.cpp
+)
+
+cxx_gmock_executable(power_status_event_listener_preset_test
+  "preset_manager_entry;preset_database_backup_infra_if_mock"
+  test/power_status_event_listener_preset_test.cpp)
+cxx_gmock_executable(preset_manager_backup_reset_on_uud_listener_test
+  "preset_manager_entry;bizglobal;common_core"
+  test/preset_manager_backup_reset_on_uud_listener_test.cpp)
+add_library_tests(preset_manager_entry
+  power_status_event_listener_preset_test
+  preset_manager_backup_reset_on_uud_listener_test)
+
+list(APPEND preset_manager_message_handler_test_dependencies preset_manager_ptz_trace_controller)
+list(APPEND preset_manager_message_handler_test_dependencies preset_status)
+list(APPEND preset_manager_message_handler_test_dependencies preset_status_if)
+list(APPEND preset_manager_message_handler_test_dependencies preset_infra_if_mock)
+list(APPEND preset_manager_message_handler_test_dependencies ptz_trace_if_mock)
+list(APPEND preset_manager_message_handler_test_dependencies ptz_trace_status_if_mock)
+list(APPEND preset_manager_message_handler_test_dependencies event_router_if_mock)
+list(APPEND preset_manager_message_handler_test_dependencies visca_status_if_mock)
+list(APPEND preset_manager_message_handler_test_dependencies ptzf_status_if_mock)
+list(APPEND preset_manager_message_handler_test_dependencies ptzf_config_if_mock)
+list(APPEND preset_manager_message_handler_test_dependencies camera_osd_status_if_mock)
+list(APPEND preset_manager_message_handler_test_dependencies op_device_status_if_mock)
+list(APPEND preset_manager_message_handler_test_dependencies visca_server_message_if_mock)
+list(APPEND preset_manager_message_handler_test_dependencies menu_status_fake)
+list(APPEND preset_manager_message_handler_test_dependencies video_status_if_mock)
+list(APPEND preset_manager_message_handler_test_dependencies power_status_if_mock)
+list(APPEND preset_manager_message_handler_test_dependencies event_router_receiver)
+if(DIADEM_BUILD)
+list(APPEND preset_manager_message_handler_test_dependencies common_diadem_uipc_if)
+endif(DIADEM_BUILD)
+list(APPEND preset_manager_message_handler_test_dependencies common_core)
+list(APPEND preset_manager_message_handler_test_dependencies preset_capability_infra_if_mock)
+
+cxx_gmock_executable(preset_manager_message_handler_test
+  "${preset_manager_message_handler_test_dependencies}"
+  preset_manager_message_handler.cpp
+  test/preset_manager_message_handler_test.cpp)
+add_library_tests(preset_manager_message_handler preset_manager_message_handler_test)
+
+list(APPEND preset_manager_message_handler_new_test_dependencies preset_manager_ptz_trace_controller_mock)
+list(APPEND preset_manager_message_handler_new_test_dependencies preset_status_mock)
+list(APPEND preset_manager_message_handler_new_test_dependencies preset_status_if_mock)
+list(APPEND preset_manager_message_handler_new_test_dependencies preset_infra_if_mock)
+list(APPEND preset_manager_message_handler_new_test_dependencies ptz_trace_if_mock)
+list(APPEND preset_manager_message_handler_new_test_dependencies ptz_trace_status_if_mock)
+list(APPEND preset_manager_message_handler_new_test_dependencies event_router_if_mock)
+list(APPEND preset_manager_message_handler_new_test_dependencies visca_status_if_mock)
+list(APPEND preset_manager_message_handler_new_test_dependencies ptzf_status_if_mock)
+list(APPEND preset_manager_message_handler_new_test_dependencies ptzf_config_if_mock)
+list(APPEND preset_manager_message_handler_new_test_dependencies camera_osd_status_if_mock)
+list(APPEND preset_manager_message_handler_new_test_dependencies op_device_status_if_mock)
+list(APPEND preset_manager_message_handler_new_test_dependencies visca_server_message_if_mock)
+list(APPEND preset_manager_message_handler_new_test_dependencies menu_status_mock)
+list(APPEND preset_manager_message_handler_new_test_dependencies video_status_if_mock)
+list(APPEND preset_manager_message_handler_new_test_dependencies power_status_if_mock)
+list(APPEND preset_manager_message_handler_new_test_dependencies event_router_receiver)
+if(DIADEM_BUILD)
+list(APPEND preset_manager_message_handler_new_test_dependencies common_diadem_uipc_if)
+endif(DIADEM_BUILD)
+list(APPEND preset_manager_message_handler_new_test_dependencies common_core)
+list(APPEND preset_manager_message_handler_new_test_dependencies preset_capability_infra_if_mock)
+
+cxx_gmock_executable(preset_manager_message_handler_new_test
+  "${preset_manager_message_handler_new_test_dependencies}"
+  preset_manager_message_handler.cpp
+  test/preset_manager_message_handler_new_test.cpp)
+add_library_tests(preset_manager_message_handler preset_manager_message_handler_new_test)
+
+cxx_static_library(preset_manager_message_if "event_router_if;common_core" preset_manager_message_if.cpp)
+cxx_static_library(preset_manager_message_if_fake "event_router_if" preset_manager_message_if_fake.cpp)
+cxx_static_library(preset_manager_message_if_mock "" preset_manager_message_if_mock.cpp)
+
+cxx_static_library(preset_mode_notifier "common" preset_mode_notifier.cpp)
+cxx_static_library(preset_common_move_speed_notifier "common" preset_common_move_speed_notifier.cpp)
+cxx_static_library(preset_move_speed_type_notifier "common" preset_move_speed_type_notifier.cpp)
+cxx_static_library(recall_action_mode_notifier "common" recall_action_mode_notifier.cpp)
+cxx_static_library(preset_status "common_core;preset_status_config_infra_if" preset_status.cpp)
+cxx_static_library(preset_status_if "common_core;preset_status_config_infra_if;preset_capability_infra_if" preset_status_if.cpp)
+cxx_static_library(preset_status_if_mock "" preset_status_if_mock.cpp)
+cxx_static_library(preset_status_mock "" preset_status_mock.cpp)
+cxx_static_library(preset_manager_ptz_trace_controller_mock "" preset_manager_ptz_trace_controller_mock.cpp)
+cxx_static_library(database_initialize_if "database_initialize_infra_if" database_initialize_if.cpp)
+cxx_gmock_executable(preset_status_test
+  "preset_status;preset_status_if;visca_config_core;common_core;preset_status_config_infra_if_mock"
+  test/preset_status_test.cpp)
+add_library_tests(preset_status preset_status_test)
+
+cxx_gmock_executable(preset_status_if_test
+  "preset_status_if;visca_config_core;common_core;preset_status_config_infra_if_mock;preset_capability_infra_if_mock"
+  test/preset_status_if_test.cpp)
+add_library_tests(preset_status_if preset_status_if_test)
+
+cxx_gmock_executable(preset_manager_message_if_test
+  "preset_manager_message_if;visca_config_core;common_core;event_router_if_mock"
+  test/preset_manager_message_if_test.cpp)
+add_library_tests(preset_manager_message_if preset_manager_message_if_test)
+
+cxx_gmock_executable(database_initialize_if_test
+  "database_initialize_if"
+  test/database_initialize_if_test.cpp)
+add_library_tests(database_initialize_if database_initialize_if_test)
+
+list(APPEND preset_manager_dependencies preset_database_backup_infra_if)
+list(APPEND preset_manager_dependencies preset_status)
+list(APPEND preset_manager_dependencies preset_status_if)
+list(APPEND preset_manager_dependencies camera_osd_status_if)
+list(APPEND preset_manager_dependencies op_device_status_if)
+list(APPEND preset_manager_dependencies common_core)
+list(APPEND preset_manager_dependencies model_info_rc)
+list(APPEND preset_manager_dependencies common_timer;preset_mode_notifier)
+list(APPEND preset_manager_dependencies preset_common_move_speed_notifier)
+list(APPEND preset_manager_dependencies preset_move_speed_type_notifier)
+list(APPEND preset_manager_dependencies recall_action_mode_notifier)
+list(APPEND preset_manager_dependencies preset_capability_infra_if)
+list(APPEND preset_manager_dependencies preset_infra_if)
+list(APPEND preset_manager_dependencies event_router_if)
+list(APPEND preset_manager_dependencies bizglobal)
+
+cxx_static_library(preset_manager
+  "${preset_manager_dependencies}"
+  preset_manager_impl.cpp
+  preset_manager_thread.cpp
+)
+
+list(APPEND preset_manager_test_dependencies preset_status)
+list(APPEND preset_manager_test_dependencies preset_status_if)
+list(APPEND preset_manager_test_dependencies common_core)
+list(APPEND preset_manager_test_dependencies model_info_rc)
+list(APPEND preset_manager_test_dependencies common_timer;preset_mode_notifier)
+list(APPEND preset_manager_test_dependencies preset_common_move_speed_notifier)
+list(APPEND preset_manager_test_dependencies preset_move_speed_type_notifier)
+list(APPEND preset_manager_test_dependencies recall_action_mode_notifier)
+list(APPEND preset_manager_test_dependencies preset_capability_infra_if_mock)
+list(APPEND preset_manager_test_dependencies ptzf_status_if_mock)
+list(APPEND preset_manager_test_dependencies ptzf_config_if_mock)
+list(APPEND preset_manager_test_dependencies camera_osd_status_if_mock)
+list(APPEND preset_manager_test_dependencies op_device_status_if_mock)
+list(APPEND preset_manager_test_dependencies preset_status)
+list(APPEND preset_manager_test_dependencies common_core)
+list(APPEND preset_manager_test_dependencies visca_server_message_if_mock)
+list(APPEND preset_manager_test_dependencies preset_database_backup_infra_if_mock)
+list(APPEND preset_manager_test_dependencies preset_infra_if_mock)
+list(APPEND preset_manager_test_dependencies event_router_if_mock)
+list(APPEND preset_manager_test_dependencies bizglobal)
+
+cxx_gmock_executable(preset_manager_test
+  "${preset_manager_test_dependencies}"
+  test/preset_manager_test.cpp
+  preset_manager_impl.cpp
+  preset_manager_thread.cpp
+)
+add_library_tests(preset_manager preset_manager_test)
+
+list(APPEND preset_manager_new_test_dependencies preset_manager)
+list(APPEND preset_manager_new_test_dependencies ptzf_status_if_mock)
+list(APPEND preset_manager_new_test_dependencies ptzf_config_if_mock)
+list(APPEND preset_manager_new_test_dependencies common_core)
+list(APPEND preset_manager_new_test_dependencies visca_server_message_if_mock)
+list(APPEND preset_manager_new_test_dependencies preset_database_backup_infra_if_mock)
+list(APPEND preset_manager_new_test_dependencies preset_status_mock)
+list(APPEND preset_manager_new_test_dependencies preset_infra_if_mock)
+
+cxx_gmock_executable(preset_manager_new_test
+  "${preset_manager_new_test_dependencies}"
+  test/preset_manager_new_test.cpp)
+add_library_tests(preset_manager preset_manager_new_test)
+
+list(APPEND preset_manager_thread_test_dependencies preset_manager)
+list(APPEND preset_manager_thread_test_dependencies ptzf_status_if)
+list(APPEND preset_manager_thread_test_dependencies ptzf_config_if)
+list(APPEND preset_manager_thread_test_dependencies preset_status)
+list(APPEND preset_manager_thread_test_dependencies common_core)
+list(APPEND preset_manager_thread_test_dependencies visca_server_message_if_mock)
+list(APPEND preset_manager_thread_test_dependencies preset_database_backup_infra_if_mock)
+list(APPEND preset_manager_thread_test_dependencies preset_capability_infra_if_mock)
+list(APPEND preset_manager_thread_test_dependencies preset_infra_if_mock)
+
+cxx_gmock_executable(preset_manager_thread_test
+  "${preset_manager_thread_test_dependencies}"
+  test/preset_manager_thread_test.cpp)
+add_library_tests(preset_manager preset_manager_thread_test)
+
+list(APPEND preset_manager_thread_new_test_dependencies preset_manager)
+list(APPEND preset_manager_thread_new_test_dependencies ptzf_status_if_mock)
+list(APPEND preset_manager_thread_new_test_dependencies ptzf_config_if_mock)
+list(APPEND preset_manager_thread_new_test_dependencies preset_status_mock)
+list(APPEND preset_manager_thread_new_test_dependencies common_core)
+list(APPEND preset_manager_thread_new_test_dependencies visca_server_message_if_mock)
+list(APPEND preset_manager_thread_new_test_dependencies preset_database_backup_infra_if_mock)
+list(APPEND preset_manager_thread_new_test_dependencies preset_capability_infra_if_mock)
+list(APPEND preset_manager_thread_new_test_dependencies preset_status_if_mock)
+list(APPEND preset_manager_thread_new_test_dependencies preset_infra_if_mock)
+list(APPEND preset_manager_thread_new_test_dependencies event_router_if_mock)
+
+cxx_gmock_executable(preset_manager_thread_new_test
+  "${preset_manager_thread_new_test_dependencies}"
+  test/preset_manager_thread_new_test.cpp)
+add_library_tests(preset_manager preset_manager_thread_new_test)
+
+list(APPEND preset_manager_ptz_trace_controller_dependencies preset_status_if)
+list(APPEND preset_manager_ptz_trace_controller_dependencies common_core)
+
+cxx_static_library(preset_manager_ptz_trace_controller
+  "${preset_manager_ptz_trace_controller_dependencies}"
+  preset_manager_ptz_trace_controller.cpp
+)
+
+list(APPEND preset_manager_ptz_trace_controller_test_dependencies preset_manager_ptz_trace_controller)
+list(APPEND preset_manager_ptz_trace_controller_test_dependencies preset_status_if_mock)
+list(APPEND preset_manager_ptz_trace_controller_test_dependencies ptz_trace_if_mock)
+list(APPEND preset_manager_ptz_trace_controller_test_dependencies common_core)
+
+cxx_gmock_executable(preset_manager_ptz_trace_controller_test
+  "${preset_manager_ptz_trace_controller_test_dependencies}"
+  test/preset_manager_ptz_trace_controller_test.cpp)
+add_library_tests(preset_manager_ptz_trace_controller preset_manager_ptz_trace_controller_test)
+
+cxx_static_library(preset_database_backup_infra_if_mock "" preset_database_backup_infra_if_mock.cpp)
+cxx_static_library(preset_status_config_infra_if_mock "" preset_status_config_infra_if_mock.cpp)
+
+if(CMAKE_CROSSCOMPILING)
+  if(DIADEM_BUILD)
+    cxx_executable_no_install(preset_manager_message_if_target_test
+      "preset_status_if;preset_manager_message_if;common_core;common_main"
+      test/preset_manager_message_if_target_test.cpp)
+    cxx_executable_no_install(preset_database_manager_target_test
+      "preset_database_backup_infra_if;preset_database_backup;common_diadem_uipc_if;common_core;common_main"
+      test/preset_database_manager_target_test.cpp)
+    cxx_executable_all(preset_backup_viewer
+      "preset_database_backup_infra_if;preset_database_backup;common_diadem_uipc_if;common_core;common_main"
+      preset_backup_viewer.cpp)
+    cxx_executable_no_install(preset_backup_clear
+      "preset_database_backup_infra_if;common_diadem_uipc_if;common_core;common_main"
+      test/preset_backup_clear.cpp)
+  elseif(G8_BUILD)
+    cxx_executable_no_install(preset_manager_message_if_target_test
+      "preset_status_if;preset_manager_message_if;common_core;common_main"
+      test/preset_manager_message_if_target_test.cpp)
+    cxx_executable_all(preset_backup_viewer
+      "preset_database_backup_infra_if;preset_database_backup;common_core;common_main;visca_config_core;bizglobal"
+      preset_backup_viewer_g8.cpp)
+    cxx_executable_no_install(preset_backup_clear
+      "preset_database_backup_infra_if;common_core;common_main"
+      test/preset_backup_clear.cpp)
+  else(DIADEM_BUILD)
+    cxx_static_library_if_no_impl(preset_capability_infra_if "" preset_capability_infra_if_fake.cpp)
+    cxx_static_library_if_no_impl(preset_database_backup_infra_if "" preset_database_backup_infra_if_fake.cpp)
+    cxx_static_library_if_no_impl(database_initialize_infra_if "" database_initialize_infra_if_fake.cpp)
+  endif(DIADEM_BUILD)
+else(CMAKE_CROSSCOMPILING)
+  cxx_static_library(preset_capability_infra_if "" preset_capability_infra_if_fake.cpp)
+  cxx_static_library(preset_infra_if "" preset_infra_if_fake.cpp)
+  cxx_static_library(preset_database_backup_infra_if "" preset_database_backup_infra_if_fake.cpp)
+  cxx_static_library(preset_status_config_infra_if "model_info_rc" preset_status_config_infra_if_fake.cpp)
+  cxx_static_library(database_initialize_infra_if "" database_initialize_infra_if_fake.cpp)
+endif(CMAKE_CROSSCOMPILING)
+
+cxx_static_library(preset_infra_if_mock "" preset_infra_if_mock.cpp)
+cxx_static_library(preset_capability_infra_if_mock "" preset_capability_infra_if_mock.cpp)
+cxx_static_library(database_initialize_if_mock "" database_initialize_if_mock.cpp)
+
+# add subdirectories
+add_subdirectory(infra)
+
+enable_coverage_report()
+enable_coverity()
+enable_verify_coding_rule("./")
