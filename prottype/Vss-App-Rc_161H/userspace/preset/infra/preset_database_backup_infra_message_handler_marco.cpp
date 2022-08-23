@@ -170,7 +170,7 @@ void PresetDatabaseBackupInfraMessageHandler::handleGetFocusModeResponse()
         if (af_transition_speed_table[i].ptp_value == value) {
             PRESET_VTRACE_RECORD(value, error, 0);
 
-            ptzf_status_if_.setAfTransitionSpeed(af_transition_speed_table[i].preset_value);
+            ptzf_config_if_.setAfTransitionSpeed(af_transition_speed_table[i].preset_value);
 
             nextStateSet();
             (this->*set_response_table_[set_state_])();
@@ -195,7 +195,7 @@ void PresetDatabaseBackupInfraMessageHandler::handleGetAfTransitionSpeedResponse
         if (af_subj_shift_sens_table[i].ptp_value == value) {
             PRESET_VTRACE_RECORD(value, error, 0);
 
-            ptzf_status_if_.setAfSubjShiftSens(af_subj_shift_sens_table[i].preset_value);
+            ptzf_config_if_.setAfSubjShiftSens(af_subj_shift_sens_table[i].preset_value);
 
             nextStateSet();
             (this->*set_response_table_[set_state_])();
@@ -220,7 +220,7 @@ void PresetDatabaseBackupInfraMessageHandler::handleGetAfSubjShiftSensResponse()
         if (focus_face_eye_detection_mode_table[i].ptp_value == value) {
             PRESET_VTRACE_RECORD(value, error, 0);
 
-            ptzf_status_if_.setFocusFaceEyedetection(focus_face_eye_detection_mode_table[i].preset_value);
+            ptzf_config_if_.setFocusFaceEyedetection(focus_face_eye_detection_mode_table[i].preset_value);
 
             nextStateSet();
             (this->*set_response_table_[set_state_])();
@@ -245,7 +245,7 @@ void PresetDatabaseBackupInfraMessageHandler::handleGetFocusFaceEyedetectionResp
         if (focus_area_table[i].ptp_value == value) {
             PRESET_VTRACE_RECORD(value, error, 0);
 
-            ptzf_status_if_.setFocusArea(focus_area_table[i].preset_value);
+            ptzf_config_if_.setFocusArea(focus_area_table[i].preset_value);
 
             nextStateSet();
             (this->*set_response_table_[set_state_])();
@@ -271,7 +271,7 @@ void PresetDatabaseBackupInfraMessageHandler::handleGetFocusAreaResponse()
 
     PRESET_VTRACE_RECORD(position_x, position_y, error);
 
-    ptzf_status_if_.setAFAreaPositionAFC(position_x, position_y);
+    ptzf_config_if_.setAFAreaPositionAFC(position_x, position_y);
 
     nextStateSet();
     (this->*set_response_table_[set_state_])();
@@ -291,7 +291,7 @@ void PresetDatabaseBackupInfraMessageHandler::handleGetAFAreaAFCResponse()
 
     PRESET_VTRACE_RECORD(position_x, position_y, error);
 
-    ptzf_status_if_.setAFAreaPositionAFS(position_x, position_y);
+    ptzf_config_if_.setAFAreaPositionAFS(position_x, position_y);
 
     nextStateSet();
     (this->*set_response_table_[set_state_])();
@@ -309,7 +309,7 @@ void PresetDatabaseBackupInfraMessageHandler::handleGetAFAreaAFSResponse()
     PRESET_VTRACE_RECORD(value, error, 0);
 
     uint32_t set_value = uint32_t(value);
-    ptzf_status_if_.setZoomPosition(set_value);
+    ptzf_config_if_.setZoomPosition(set_value);
 
     nextStateSet();
     (this->*set_response_table_[set_state_])();
@@ -327,7 +327,7 @@ void PresetDatabaseBackupInfraMessageHandler::handleGetZoomPositionResponse()
     PRESET_VTRACE_RECORD(value, error, 0);
 
     uint32_t set_value = uint32_t(value);
-    ptzf_status_if_.setFocusPosition(set_value);
+    ptzf_config_if_.setFocusPosition(set_value);
 
     nextStateSet();
     (this->*set_response_table_[set_state_])();

@@ -12,6 +12,7 @@
 #include "visca/dboutputs/enum.h"
 #include "ptzf_parameter.h"
 #include "ptzf_enum.h"
+#include "ptzf/ptzf_config_if_mock.h"
 
 namespace ptzf {
 
@@ -81,33 +82,24 @@ public:
     MOCK_CONST_METHOD1(roundTiltMaxSpeed, u8_t(const u8_t tilt_speed));
     MOCK_CONST_METHOD0(getStandbyMode, StandbyMode());
     MOCK_CONST_METHOD2(getFocusMode, void(const u32_t preset_id, FocusMode& focus_mode));
-//@    MOCK_CONST_METHOD1(setFocusMode, void(FocusMode focus_mode));
     MOCK_CONST_METHOD2(getAfTransitionSpeed, void(const u32_t preset_id, u8_t& af_transition_speed));
-    MOCK_CONST_METHOD1(setAfTransitionSpeed, void(u8_t af_transition_speed));
     MOCK_CONST_METHOD2(getAfSubjShiftSens, void(const u32_t preset_id, u8_t& af_subj_shift_sens));
-    MOCK_CONST_METHOD1(setAfSubjShiftSens, void(u8_t af_subj_shift_sens));
     MOCK_CONST_METHOD2(getFocusFaceEyedetection,
                        void(const u32_t preset_id, FocusFaceEyeDetectionMode& detection_mode));
-    MOCK_CONST_METHOD1(setFocusFaceEyedetection, void(FocusFaceEyeDetectionMode detection_mode));
     MOCK_CONST_METHOD2(getFocusArea, void(const u32_t preset_id, FocusArea& focus_area));
-    MOCK_CONST_METHOD1(setFocusArea, void(FocusArea focus_area));
     MOCK_CONST_METHOD3(getAFAreaPositionAFC, void(const u32_t preset_id, u16_t& position_x, u16_t& position_y));
-    MOCK_CONST_METHOD2(setAFAreaPositionAFC, void(u16_t position_x, u16_t position_y));
     MOCK_CONST_METHOD3(getAFAreaPositionAFS, void(const u32_t preset_id, u16_t& position_x, u16_t& position_y));
-    MOCK_CONST_METHOD2(setAFAreaPositionAFS, void(u16_t position_x, u16_t position_y));
     MOCK_CONST_METHOD1(getZoomPosition, void(u32_t& position));
     MOCK_CONST_METHOD2(getZoomPosition, void(const u32_t preset_id, u32_t& position));
-    MOCK_CONST_METHOD1(setZoomPosition, void(u32_t position));
     MOCK_CONST_METHOD1(getFocusPosition, void(u32_t& position));
     MOCK_CONST_METHOD2(getFocusPosition, void(const u32_t preset_id, u32_t& position));
-    MOCK_CONST_METHOD1(setFocusPosition, void(u32_t position));
     MOCK_CONST_METHOD0(isClearImageZoomOn, bool());
-    MOCK_CONST_METHOD1(setPtMiconPowerOnCompStatus, void(const bool complete));
     MOCK_CONST_METHOD1(getPtMiconPowerOnCompStatus, void(bool& complete));
     MOCK_CONST_METHOD1(getPanTiltLock, void(bool& enable));
     MOCK_CONST_METHOD1(getPanTiltLockControlStatus, void(PanTiltLockControlStatus& status));
     MOCK_CONST_METHOD0(initializePanTiltPosition, void());
 };
+
 #pragma GCC diagnostic warning "-Weffc++"
 
 } // namespace ptzf
