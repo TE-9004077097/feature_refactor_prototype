@@ -78,6 +78,7 @@ public:
     bool setTiltLimitMode(const bool tilt_limit_mode);
     bool getPanLimitMode(bool& pan_limit_mode);
     bool getTiltLimitMode(bool& tilt_limit_mode);
+    bool setFocusMode(const FocusMode focus_mode);
     bool getFocusMode(const u32_t preset_id, FocusMode& focus_mode);
     bool getAfTransitionSpeed(const u32_t preset_id, u8_t& af_transition_speed);
     bool setAfTransitionSpeed(const u8_t af_transition_speed);

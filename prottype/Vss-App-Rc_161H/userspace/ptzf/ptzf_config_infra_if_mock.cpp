@@ -31,12 +31,6 @@ PtzfConfigInfraIf::PtzfConfigInfraIf() : pimpl_(new Impl)
 PtzfConfigInfraIf::~PtzfConfigInfraIf()
 {}
 
-bool PtzfConfigInfraIf::setPanTiltError(const bool error)
-{
-    PtzfConfigInfraIfMock& mock = pimpl_->mock_holder.getMock();
-    return mock.setPanTiltError(error);
-}
-
 bool PtzfConfigInfraIf::setFocusMode(const FocusMode focus_mode)
 {
     PtzfConfigInfraIfMock& mock = pimpl_->mock_holder.getMock();
