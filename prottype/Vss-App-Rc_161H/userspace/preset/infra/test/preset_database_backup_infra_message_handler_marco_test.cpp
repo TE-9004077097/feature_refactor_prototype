@@ -90,28 +90,28 @@ protected:
         EXPECT_CALL(ptzf_config_if_mock_, setFocusMode(_)).Times(1).WillOnce(Return());
 
         // SetAfTransitionSpeed
-        EXPECT_CALL(ptzf_status_if_mock_, setAfTransitionSpeed(_)).Times(1).WillOnce(Return());
+        EXPECT_CALL(ptzf_config_if_mock_, setAfTransitionSpeed(_)).Times(1).WillOnce(Return());
 
         // SetAfSubjShiftSens
-        EXPECT_CALL(ptzf_status_if_mock_, setAfSubjShiftSens(_)).Times(1).WillOnce(Return());
+        EXPECT_CALL(ptzf_config_if_mock_, setAfSubjShiftSens(_)).Times(1).WillOnce(Return());
 
         // SetFocusFaceEyedetection
-        EXPECT_CALL(ptzf_status_if_mock_, setFocusFaceEyedetection(_)).Times(1).WillOnce(Return());
+        EXPECT_CALL(ptzf_config_if_mock_, setFocusFaceEyedetection(_)).Times(1).WillOnce(Return());
 
         // SetFocusArea
-        EXPECT_CALL(ptzf_status_if_mock_, setFocusArea(_)).Times(1).WillOnce(Return());
+        EXPECT_CALL(ptzf_config_if_mock_, setFocusArea(_)).Times(1).WillOnce(Return());
 
         // SetAFAreaPositionAFC
-        EXPECT_CALL(ptzf_status_if_mock_, setAFAreaPositionAFC(_, _)).Times(1).WillOnce(Return());
+        EXPECT_CALL(ptzf_config_if_mock_, setAFAreaPositionAFC(_, _)).Times(1).WillOnce(Return());
 
         // SetAFAreaPositionAFS
-        EXPECT_CALL(ptzf_status_if_mock_, setAFAreaPositionAFS(_, _)).Times(1).WillOnce(Return());
+        EXPECT_CALL(ptzf_config_if_mock_, setAFAreaPositionAFS(_, _)).Times(1).WillOnce(Return());
 
         // SetZoomPosition
-        EXPECT_CALL(ptzf_status_if_mock_, setZoomPosition(_)).Times(1).WillOnce(Return());
+        EXPECT_CALL(ptzf_config_if_mock_, setZoomPosition(_)).Times(1).WillOnce(Return());
 
         // SetFocusPosition
-        EXPECT_CALL(ptzf_status_if_mock_, setFocusPosition(_)).Times(1).WillOnce(Return());
+        EXPECT_CALL(ptzf_config_if_mock_, setFocusPosition(_)).Times(1).WillOnce(Return());
     }
 
 protected:
