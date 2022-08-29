@@ -25,7 +25,7 @@ PresetDatabaseBackupInfraMessageHandler::PresetDatabaseBackupInfraMessageHandler
       select_(common::Select::tlsInstance()),
       mq_(PresetDatabaseBackupInfraMessageHandler::getName()),
       ptzf_status_if_(),
-      ptzf_config_if_(),
+      biz_ptzf_if_(),
       set_preset_id_(U32_T(0)),
       set_reply_mq_name_(),
       set_state_(),

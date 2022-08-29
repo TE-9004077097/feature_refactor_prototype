@@ -770,17 +770,12 @@ public:
     bool setPTZTraceDelete(const u32_t trace_id, const u32_t seq_id);
     bool setStandbyMode(const StandbyMode standby_mode, const u32_t seq_id);
     bool setName(const TraceName& name, const u32_t seq_id);
-
-    bool setFocusMode(const ptzf::FocusMode focus_mode, const u32_t seq_id);
-    //bool setAfTransitionSpeed(const u8_t af_transition_speed) const;
-    //bool setAfSubjShiftSens(const u8_t af_subj_shift_sens) const;
-    //bool setFocusFaceEyedetection(const FocusFaceEyeDetectionMode detection_mode) const;
-    bool setFocusArea(const ptzf::FocusArea focus_area, const u32_t seq_id);
+    bool setFocusMode(const FocusMode focus_mode, const u32_t seq_id);
+    bool setFocusArea(const FocusArea focus_area, const u32_t seq_id);
     bool setAFAreaPositionAFC(const u16_t position_x, const u16_t position_y, const u32_t seq_id);
     bool setAFAreaPositionAFS(const u16_t position_x, const u16_t position_y, const u32_t seq_id);
     bool setZoomPosition(const u32_t position, const u32_t seq_id);
     bool setFocusPosition(const u32_t position, const u32_t seq_id);
-    
     bool setAfSubjShiftSens(const uint8_t& af_subj_shift_sens, const u32_t seq_id);
     bool setAfTransitionSpeed(const uint8_t& af_transition_speed, const u32_t seq_id);
     bool noticeCreateTraceThumbnailComp(const std::string file_path, const u32_t trace_id, const u32_t seq_id);
@@ -1488,16 +1483,16 @@ bool BizPtzfIf::BizPtzfIfImpl::setName(const TraceName& name, const u32_t seq_id
 
     return true;
 }
- 
-bool BizPtzfIf::BizPtzfIfImpl::setFocusMode(const ptzf::FocusMode focus_mode, const u32_t seq_id)
+
+bool BizPtzfIf::BizPtzfIfImpl::setFocusMode(const FocusMode focus_mode, const u32_t seq_id)
 {
-    ptzf::FocusModeRequest request(focus_mode, seq_id, mq_name_);
+    ptzf::FocusModeRequest request(static_cast<ptzf::FocusMode>(focus_mode), seq_id, mq_name_);
     msg_if_.post(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER, request);
     return true;
 }
-bool BizPtzfIf::BizPtzfIfImpl::setFocusArea(const ptzf::FocusArea focus_area, const u32_t seq_id)
+bool BizPtzfIf::BizPtzfIfImpl::setFocusArea(const FocusArea focus_area, const u32_t seq_id)
 {
-    ptzf::FocusAreaRequest request(focus_area, seq_id, mq_name_);
+    ptzf::FocusAreaRequest request(static_cast<ptzf::FocusArea>(focus_area), seq_id, mq_name_);
     msg_if_.post(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER, request);
     return true;
 }
@@ -1525,7 +1520,7 @@ bool BizPtzfIf::BizPtzfIfImpl::setFocusPosition(const u32_t position, const u32_
     msg_if_.post(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER, request);
     return true;
 }
- 
+
 bool BizPtzfIf::BizPtzfIfImpl::setAfSubjShiftSens(const uint8_t& af_subj_shift_sens, const u32_t seq_id)
 {
     if (!isValidSeqId(seq_id)) {
@@ -2916,12 +2911,12 @@ bool BizPtzfIf::setName(const TraceName& name, const u32_t seq_id)
     return pimpl_->setName(name, seq_id);
 }
 
-bool BizPtzfIf::setFocusMode(const ptzf::FocusMode focus_mode, const u32_t seq_id)
+bool BizPtzfIf::setFocusMode(const FocusMode focus_mode, const u32_t seq_id)
 {
     return pimpl_->setFocusMode(focus_mode, seq_id);
 }
 
-bool BizPtzfIf::setFocusArea(const ptzf::FocusArea focus_area, const u32_t seq_id)
+bool BizPtzfIf::setFocusArea(const FocusArea focus_area, const u32_t seq_id)
 {
     return pimpl_->setFocusArea(focus_area, seq_id);
 }

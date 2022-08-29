@@ -57,18 +57,15 @@ const struct AFSubjShiftSensTable
     { U8_T(1), U8_T(1) }, { U8_T(2), U8_T(2) }, { U8_T(3), U8_T(3) },
     { U8_T(4), U8_T(4) }, { U8_T(5), U8_T(5) },
 };
-
 const struct FocusFaceEyeDetectionModeTable
 {
     ptp::CrFaceEyeDetectionAF ptp_value;
     ptzf::FocusFaceEyeDetectionMode preset_value;
-    biz_ptzf::FocusFaceEyeDetectionMode biz_preset_value;
 } focus_face_eye_detection_mode_table[] = {
-    { ptp::CR_FACE_EYE_DETECTIONAF_FACE_EYE_ONLYAF, ptzf::FOCUS_FACE_EYE_DETECTION_MODE_FACE_EYE_ONLY, biz_ptzf::FOCUS_FACE_EYE_DETECTION_MODE_FACE_EYE_ONLY },
-    { ptp::CR_FACE_EYE_DETECTIONAF_FACE_EYE_PRIORITYAF, ptzf::FOCUS_FACE_EYE_DETECTION_MODE_FACE_EYE_PRIORITY, biz_ptzf::FOCUS_FACE_EYE_DETECTION_MODE_FACE_EYE_PRIORITY },
-    { ptp::CR_FACE_EYE_DETECTIONAF_OFF, ptzf::FOCUS_FACE_EYE_DETECTION_MODE_OFF, biz_ptzf::FOCUS_FACE_EYE_DETECTION_MODE_OFF },
+    { ptp::CR_FACE_EYE_DETECTIONAF_FACE_EYE_ONLYAF, ptzf::FOCUS_FACE_EYE_DETECTION_MODE_FACE_EYE_ONLY },
+    { ptp::CR_FACE_EYE_DETECTIONAF_FACE_EYE_PRIORITYAF, ptzf::FOCUS_FACE_EYE_DETECTION_MODE_FACE_EYE_PRIORITY },
+    { ptp::CR_FACE_EYE_DETECTIONAF_OFF, ptzf::FOCUS_FACE_EYE_DETECTION_MODE_OFF },
 };
-
 const struct FocusAreaModeTable
 {
     uint8_t ptp_value;
@@ -146,7 +143,7 @@ void PresetDatabaseBackupInfraMessageHandler::doHandleRequest(const SetPresetReq
         if (focus_mode_table[i].ptp_value == value) {
             PRESET_VTRACE_RECORD(value, error, 0);
 
-            biz_ptzf_if_.setFocusMode(focus_mode_table[i].preset_value);
+            biz_ptzf_if_.setFocusMode(static_cast<biz_ptzf::FocusMode>(focus_mode_table[i].preset_value));
 
             nextStateSet();
             (this->*set_response_table_[set_state_])();
@@ -221,7 +218,7 @@ void PresetDatabaseBackupInfraMessageHandler::handleGetAfSubjShiftSensResponse()
         if (focus_face_eye_detection_mode_table[i].ptp_value == value) {
             PRESET_VTRACE_RECORD(value, error, 0);
 
-            biz_ptzf_if_.setFocusFaceEyedetection(focus_face_eye_detection_mode_table[i].biz_preset_value);
+            biz_ptzf_if_.setFocusFaceEyedetection(static_cast<biz_ptzf::FocusFaceEyeDetectionMode>(focus_face_eye_detection_mode_table[i].preset_value));
 
             nextStateSet();
             (this->*set_response_table_[set_state_])();
@@ -246,7 +243,7 @@ void PresetDatabaseBackupInfraMessageHandler::handleGetFocusFaceEyedetectionResp
         if (focus_area_table[i].ptp_value == value) {
             PRESET_VTRACE_RECORD(value, error, 0);
 
-            biz_ptzf_if_.setFocusArea(focus_area_table[i].preset_value);
+            biz_ptzf_if_.setFocusArea(static_cast<biz_ptzf::FocusArea>(focus_area_table[i].preset_value));
 
             nextStateSet();
             (this->*set_response_table_[set_state_])();
