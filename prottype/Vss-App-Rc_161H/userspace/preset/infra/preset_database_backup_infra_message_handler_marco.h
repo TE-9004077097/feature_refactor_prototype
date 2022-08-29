@@ -14,7 +14,7 @@
 #include "common_message_queue.h"
 #include "preset_infra_message.h"
 #include "ptzf/ptzf_status_if.h"
-#include "ptzf/ptzf_config_if.h"
+#include "biz_ptzf_if.h"
 #include "ptp/driver/ptp_driver_command_if.h"
 #include "ptp/driver/ptp_driver_if_message.h"
 #include "sequence_id_controller.h"
@@ -84,7 +84,7 @@ private:
     common::Select& select_;
     common::MessageQueue mq_;
     ptzf::PtzfStatusIf ptzf_status_if_;
-    ptzf::PtzfConfigIf ptzf_config_if_;
+    biz_ptzf::BizPtzfIf biz_ptzf_if_;
     uint32_t set_preset_id_;
     common::MessageQueueName set_reply_mq_name_;
     PresetSetState set_state_;
