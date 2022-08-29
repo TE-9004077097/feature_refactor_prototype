@@ -4,6 +4,8 @@
  * Copyright 2021 Sony Corporation
  */
 
+//#define TEST_STATUS
+
 #include "gtl_memory.h"
 #include "gtl_string.h"
 #include "gtest/gtest.h"
@@ -44,13 +46,13 @@ namespace preset {
 namespace infra {
 
 // + setPresetSuccess
-//   - SetPreset謌仙粥
+//   - SetPreset成功
 // + setPresetZoomPositionFailure
-//   - ZoomPositionSetting繧ｨ繝ｩ繝ｼ蠕熊ocusPositionSetting
+//   - ZoomPositionSettingエラー後FocusPositionSetting
 // + setPresetFocusCommandFailure
-//   - Focus髢｢騾｣繧ｳ繝槭Φ繝峨☆縺ｹ縺ｦ繧ｨ繝ｩ繝ｼ蠕兄oomPositionSetting
+//   - Focus関連コマンドすべてエラー後ZoomPositionSetting
 // + setPresetAllCommandFailure
-//   - 繧ｳ繝槭Φ繝峨☆縺ｹ縺ｦ繧ｨ繝ｩ繝ｼ蠕郡etPresetResult繧定ｿ泌唆
+//   - コマンドすべてエラー後SetPresetResultを返却
 
 class PresetDatabaseBackupInfraMessageHandlerTest : public ::testing::Test
 {
@@ -61,7 +63,6 @@ protected:
           ptzf_mock_holder_object_(),
           ptzf_mock_holder_object_config_(),
           ptzf_status_if_mock_(ptzf_mock_holder_object_.getMock()),
-          ptzf_config_if_mock_(ptzf_mock_holder_object_config_.getMock()),
           visca_ptzf_if_mock_holder_object(),
           visca_ptzf_if_mock_(visca_ptzf_if_mock_holder_object.getMock()),
           visca_if_mock_holder_object(),
@@ -83,7 +84,8 @@ protected:
         config_mq.unlink();
         reply_.unlink();
     }
-
+#ifdef TEST_STATUS
+    //TODO テスト未実装。実装時は恐らく以下を実行。（その際、ptzf_config_if_mock_は適切な値に書き換える）
     void setPtzfStatusParameters()
     {
         // SetFocusMode
@@ -113,14 +115,13 @@ protected:
         // SetFocusPosition
         EXPECT_CALL(ptzf_config_if_mock_, setFocusPosition(_)).Times(1).WillOnce(Return());
     }
-
+#endif
 protected:
     MockHolderObject<ptp::driver::PtpDriverCommandIfMock> ptp_driver_if_mock_holder_;
     ptp::driver::PtpDriverCommandIfMock& ptp_driver_if_mock_;
     MockHolderObject<ptzf::PtzfStatusIfMock> ptzf_mock_holder_object_;
     MockHolderObject<ptzf::PtzfConfigIfMock> ptzf_mock_holder_object_config_;
     ptzf::PtzfStatusIfMock& ptzf_status_if_mock_;
-    ptzf::PtzfConfigIfMock& ptzf_config_if_mock_;
     MockHolderObject<visca::ViscaServerPtzfIfMock> visca_ptzf_if_mock_holder_object;
     visca::ViscaServerPtzfIfMock& visca_ptzf_if_mock_;
     MockHolderObject<visca::ViscaServerMessageIfMock> visca_if_mock_holder_object;
@@ -131,8 +132,11 @@ protected:
 
 TEST_F(PresetDatabaseBackupInfraMessageHandlerTest, setPresetSuccess)
 {
-    // PtzfStatusIf
-    setPtzfStatusParameters();
+
+    #ifdef TEST_STATUS
+        // PtzfStatusIf
+        setPtzfStatusParameters();
+    #endif
 
     // GetFocusMode
     u32_t dp_code = ptp::CR_DEVICE_PROPERTY_FOCUS_MODE_SETTING;
@@ -207,8 +211,10 @@ TEST_F(PresetDatabaseBackupInfraMessageHandlerTest, setPresetSuccess)
 
 TEST_F(PresetDatabaseBackupInfraMessageHandlerTest, setPresetZoomPositionFailure)
 {
-    // PtzfStatusIf
-    setPtzfStatusParameters();
+    #ifdef TEST_STATUS
+        // PtzfStatusIf
+        setPtzfStatusParameters();
+    #endif
 
     // GetFocusMode
     u32_t dp_code = ptp::CR_DEVICE_PROPERTY_FOCUS_MODE_SETTING;
@@ -283,8 +289,10 @@ TEST_F(PresetDatabaseBackupInfraMessageHandlerTest, setPresetZoomPositionFailure
 
 TEST_F(PresetDatabaseBackupInfraMessageHandlerTest, setPresetFocusCommandFailure)
 {
-    // PtzfStatusIf
-    setPtzfStatusParameters();
+    #ifdef TEST_STATUS
+        // PtzfStatusIf
+        setPtzfStatusParameters();
+    #endif
 
     // GetFocusMode
     u32_t dp_code = ptp::CR_DEVICE_PROPERTY_FOCUS_MODE_SETTING;
@@ -359,9 +367,10 @@ TEST_F(PresetDatabaseBackupInfraMessageHandlerTest, setPresetFocusCommandFailure
 
 TEST_F(PresetDatabaseBackupInfraMessageHandlerTest, setPresetAllCommandFailure)
 {
-    // PtzfStatusIf
-    setPtzfStatusParameters();
-
+    #ifdef TEST_STATUS
+        // PtzfStatusIf
+        setPtzfStatusParameters();
+    #endif
     // GetFocusMode
     u32_t dp_code = ptp::CR_DEVICE_PROPERTY_FOCUS_MODE_SETTING;
     uint64_t value = U8_T(1);

@@ -13,7 +13,6 @@
 #include "power_control_infra_if.h"
 #include "power_sequencer_trace.h"
 #include "ptzf/ptzf_status_if.h"
-#include "ptzf/ptzf_config_if.h"
 #include "inbound/general/need_pan_tilt_initialize.h"
 
 namespace power {

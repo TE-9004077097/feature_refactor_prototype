@@ -103,7 +103,6 @@ public:
 
     StandbyMode getStandbyMode() const;
 
-    // FIXME setはBizIf経由で行うように修正する
     void getFocusMode(const u32_t preset_id, FocusMode& focus_mode) const;
     void getAfTransitionSpeed(const u32_t preset_id, u8_t& af_transition_speed) const;
     void getAfSubjShiftSens(const u32_t preset_id, u8_t& af_subj_shift_sens) const;

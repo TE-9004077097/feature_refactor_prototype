@@ -19,7 +19,6 @@
 #include "power_sequencer_reboot_infra_if.h"
 #include "power_control_infra_if_mock.h"
 #include "ptzf/ptzf_status_if_mock.h"
-#include "ptzf/ptzf_config_if_mock.h"
 
 using ::testing::Return;
 

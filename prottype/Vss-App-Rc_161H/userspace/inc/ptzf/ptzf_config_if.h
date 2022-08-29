@@ -10,7 +10,6 @@
 #include "types.h"
 #include "errorcode.h"
 #include "gtl_memory.h"
-#include "visca/dboutputs/enum.h"
 #include "ptzf/ptzf_parameter.h"
 #include "ptzf/ptzf_enum.h"
 
@@ -22,7 +21,6 @@ public:
     PtzfConfigIf();
     ~PtzfConfigIf();
 
-    // FIXME setはBizIf経由で行うように修正する
     void setFocusMode(const FocusMode focus_mode) const;
     void setAfTransitionSpeed(const u8_t af_transition_speed) const;
     void setAfSubjShiftSens(const u8_t af_subj_shift_sens) const;

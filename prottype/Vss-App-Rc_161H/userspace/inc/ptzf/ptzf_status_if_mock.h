@@ -12,7 +12,6 @@
 #include "visca/dboutputs/enum.h"
 #include "ptzf_parameter.h"
 #include "ptzf_enum.h"
-#include "ptzf/ptzf_config_if_mock.h"
 
 namespace ptzf {
 

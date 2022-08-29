@@ -19,7 +19,6 @@
 #include "event_router/event_router_target_type.h"
 #include "ptzf/ptzf_status_if.h"
 #include "../ptzf/ptzf_status.h"
-#include "ptzf/ptzf_config_if.h"
 #include "visca/dboutputs/enum.h"
 #include "application/error_notifier/error_notifier_message_if.h"
 #include "ptzf/ptzf_biz_message_if_mock.h"
