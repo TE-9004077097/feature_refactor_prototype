@@ -57,6 +57,7 @@ const struct AFSubjShiftSensTable
     { U8_T(1), U8_T(1) }, { U8_T(2), U8_T(2) }, { U8_T(3), U8_T(3) },
     { U8_T(4), U8_T(4) }, { U8_T(5), U8_T(5) },
 };
+
 const struct FocusFaceEyeDetectionModeTable
 {
     ptp::CrFaceEyeDetectionAF ptp_value;
@@ -66,6 +67,7 @@ const struct FocusFaceEyeDetectionModeTable
     { ptp::CR_FACE_EYE_DETECTIONAF_FACE_EYE_PRIORITYAF, ptzf::FOCUS_FACE_EYE_DETECTION_MODE_FACE_EYE_PRIORITY },
     { ptp::CR_FACE_EYE_DETECTIONAF_OFF, ptzf::FOCUS_FACE_EYE_DETECTION_MODE_OFF },
 };
+
 const struct FocusAreaModeTable
 {
     uint8_t ptp_value;

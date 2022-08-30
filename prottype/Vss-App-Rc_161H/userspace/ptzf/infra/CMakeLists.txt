@@ -287,11 +287,11 @@ cxx_gmock_executable(ptzf_status_infra_if_test
   ptzf_status_infra_if.cpp
 )
 
-cxx_gmock_executable(ptzf_config_infra_if_test
-  "model_info_rc;common_core;visca_config_core;ptzf_zoom_infra_if_mock"
-  test/ptzf_status_infra_if_test.cpp
-  ptzf_status_infra_if.cpp
-)
+#cxx_gmock_executable(ptzf_config_infra_if_test
+#  "model_info_rc;common_core;visca_config_core;ptzf_zoom_infra_if_mock"
+#  test/ptzf_status_infra_if_test.cpp
+#  ptzf_status_infra_if.cpp
+#)
 
 cxx_gmock_executable(ptzf_status_infra_if_new_test
   "model_info_rc;common_core;visca_config_fake;ptzf_zoom_infra_if_mock"
@@ -299,11 +299,11 @@ cxx_gmock_executable(ptzf_status_infra_if_new_test
   ptzf_status_infra_if.cpp
 )
 
-cxx_gmock_executable(ptzf_config_infra_if_new_test
-  "model_info_rc;common_core;visca_config_fake;ptzf_zoom_infra_if_mock"
-  test/ptzf_status_infra_if_new_test.cpp
-  ptzf_status_infra_if.cpp
-)
+#cxx_gmock_executable(ptzf_config_infra_if_new_test
+#  "model_info_rc;common_core;visca_config_fake;ptzf_zoom_infra_if_mock"
+#  test/ptzf_status_infra_if_new_test.cpp
+#  ptzf_status_infra_if.cpp
+#)
 
 if(APPRC_PANTILTT_INITIAL_POSITION_LAST_STOPPED)
   cxx_gmock_executable(ptzf_status_infra_if_save_last_position_test
@@ -322,9 +322,9 @@ else(APPRC_PANTILTT_INITIAL_POSITION_LAST_STOPPED)
 endif(APPRC_PANTILTT_INITIAL_POSITION_LAST_STOPPED)
 
 add_library_tests(ptzf_status_infra_if ptzf_status_infra_if_test)
-add_library_tests(ptzf_config_infra_if ptzf_config_infra_if_test)
+#add_library_tests(ptzf_config_infra_if ptzf_config_infra_if_test)
 add_library_tests(ptzf_status_infra_if ptzf_status_infra_if_new_test)
-add_library_tests(ptzf_config_infra_if ptzf_config_infra_if_new_test)
+#add_library_tests(ptzf_config_infra_if ptzf_config_infra_if_new_test)
 
 
 if(DIADEM_BUILD)

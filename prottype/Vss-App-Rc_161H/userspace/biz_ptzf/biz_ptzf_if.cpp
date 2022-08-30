@@ -26,6 +26,7 @@
 #include "ptzf/ptz_trace_message.h"
 #include "preset/preset_manager_message.h"
 #include "gtl_container_foreach.h"
+#include "ptzf/ptzf_parameter.h"
 
 namespace biz_ptzf {
 
