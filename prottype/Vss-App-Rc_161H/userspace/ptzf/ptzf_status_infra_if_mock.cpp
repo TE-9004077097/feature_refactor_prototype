@@ -367,22 +367,10 @@ bool PtzfStatusInfraIf::getFocusMode(const u32_t preset_id, FocusMode& focus_mod
     return mock.getFocusMode(preset_id, focus_mode);
 }
 
-//@bool PtzfStatusInfraIf::setFocusMode(const FocusMode focus_mode)
-//@{
-//@    PtzfConfigInfraIfMock& mock = pimplConfig_->mock_holder.getMock();
-//@    return mock.setFocusMode(focus_mode);
-//@}
-
 bool PtzfStatusInfraIf::getAfTransitionSpeed(const u32_t preset_id, u8_t& af_transition_speed)
 {
     PtzfStatusInfraIfMock& mock = pimpl_->mock_holder.getMock();
     return mock.getAfTransitionSpeed(preset_id, af_transition_speed);
-}
-
-bool PtzfStatusInfraIf::setAfTransitionSpeed(const u8_t af_transition_speed)
-{
-    PtzfStatusInfraIfMock& mock = pimpl_->mock_holder.getMock();
-    return mock.setAfTransitionSpeed(af_transition_speed);
 }
 
 bool PtzfStatusInfraIf::getAfSubjShiftSens(const u32_t preset_id, u8_t& af_subj_shift_sens)
@@ -391,22 +379,10 @@ bool PtzfStatusInfraIf::getAfSubjShiftSens(const u32_t preset_id, u8_t& af_subj_
     return mock.getAfSubjShiftSens(preset_id, af_subj_shift_sens);
 }
 
-bool PtzfStatusInfraIf::setAfSubjShiftSens(const u8_t af_subj_shift_sens)
-{
-    PtzfStatusInfraIfMock& mock = pimpl_->mock_holder.getMock();
-    return mock.setAfSubjShiftSens(af_subj_shift_sens);
-}
-
 bool PtzfStatusInfraIf::getFocusFaceEyedetection(const u32_t preset_id, FocusFaceEyeDetectionMode& detection_mode)
 {
     PtzfStatusInfraIfMock& mock = pimpl_->mock_holder.getMock();
     return mock.getFocusFaceEyedetection(preset_id, detection_mode);
-}
-
-bool PtzfStatusInfraIf::setFocusFaceEyedetection(const FocusFaceEyeDetectionMode detection_mode)
-{
-    PtzfStatusInfraIfMock& mock = pimpl_->mock_holder.getMock();
-    return mock.setFocusFaceEyedetection(detection_mode);
 }
 
 bool PtzfStatusInfraIf::getFocusArea(const u32_t preset_id, FocusArea& focus_area)
@@ -415,34 +391,15 @@ bool PtzfStatusInfraIf::getFocusArea(const u32_t preset_id, FocusArea& focus_are
     return mock.getFocusArea(preset_id, focus_area);
 }
 
-bool PtzfStatusInfraIf::setFocusArea(const FocusArea focus_area)
-{
-    PtzfStatusInfraIfMock& mock = pimpl_->mock_holder.getMock();
-    return mock.setFocusArea(focus_area);
-}
-
 bool PtzfStatusInfraIf::getAFAreaPositionAFC(const u32_t preset_id, u16_t& position_x, u16_t& position_y)
 {
     PtzfStatusInfraIfMock& mock = pimpl_->mock_holder.getMock();
     return mock.getAFAreaPositionAFC(preset_id, position_x, position_y);
 }
-
-bool PtzfStatusInfraIf::setAFAreaPositionAFC(const u16_t position_x, const u16_t position_y)
-{
-    PtzfStatusInfraIfMock& mock = pimpl_->mock_holder.getMock();
-    return mock.setAFAreaPositionAFC(position_x, position_y);
-}
-
 bool PtzfStatusInfraIf::getAFAreaPositionAFS(const u32_t preset_id, u16_t& position_x, u16_t& position_y)
 {
     PtzfStatusInfraIfMock& mock = pimpl_->mock_holder.getMock();
     return mock.getAFAreaPositionAFS(preset_id, position_x, position_y);
-}
-
-bool PtzfStatusInfraIf::setAFAreaPositionAFS(const u16_t position_x, const u16_t position_y)
-{
-    PtzfStatusInfraIfMock& mock = pimpl_->mock_holder.getMock();
-    return mock.setAFAreaPositionAFS(position_x, position_y);
 }
 
 bool PtzfStatusInfraIf::getZoomPosition(const u32_t preset_id, u32_t& position)
@@ -451,22 +408,10 @@ bool PtzfStatusInfraIf::getZoomPosition(const u32_t preset_id, u32_t& position)
     return mock.getZoomPosition(preset_id, position);
 }
 
-bool PtzfStatusInfraIf::setZoomPosition(const u32_t position)
-{
-    PtzfStatusInfraIfMock& mock = pimpl_->mock_holder.getMock();
-    return mock.setZoomPosition(position);
-}
-
 bool PtzfStatusInfraIf::getFocusPosition(const u32_t preset_id, u32_t& position)
 {
     PtzfStatusInfraIfMock& mock = pimpl_->mock_holder.getMock();
     return mock.getFocusPosition(preset_id, position);
-}
-
-bool PtzfStatusInfraIf::setFocusPosition(const u32_t position)
-{
-    PtzfStatusInfraIfMock& mock = pimpl_->mock_holder.getMock();
-    return mock.setFocusPosition(position);
 }
 
 bool PtzfStatusInfraIf::getPanTiltLock(bool& enable)
@@ -485,12 +430,6 @@ bool PtzfStatusInfraIf::isClearImageZoomOn()
 {
     PtzfStatusInfraIfMock& mock = pimpl_->mock_holder.getMock();
     return mock.isClearImageZoomOn();
-}
-
-void PtzfStatusInfraIf::setPtMiconPowerOnCompStatus(const bool is_complete)
-{
-    PtzfStatusInfraIfMock& mock = pimpl_->mock_holder.getMock();
-    mock.setPtMiconPowerOnCompStatus(is_complete);
 }
 
 void PtzfStatusInfraIf::getPtMiconPowerOnCompStatus(bool& is_complete)

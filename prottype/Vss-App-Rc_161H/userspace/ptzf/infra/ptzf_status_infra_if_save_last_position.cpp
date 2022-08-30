@@ -9,7 +9,6 @@
 #include "common_mutex.h"
 
 #include "ptzf_status_infra_if.h"
-#include "ptzf_config_infra_if.h"
 
 #include "config/visca_config.h"
 #include "config/model_info_rc.h"
@@ -233,6 +232,11 @@ bool PtzfStatusInfraIf::setPanTiltPosition(const u32_t preset_id, const u32_t pa
 bool PtzfStatusInfraIf::getPanTiltLatestPosition(u32_t& pan, u32_t& tilt)
 {
     return pimpl_->getPanTiltLatestPosition(pan, tilt);
+}
+
+bool PtzfStatusInfraIf::setFocusMode(const FocusMode focus_mode)
+{
+    return pimpl_->setFocusMode(focus_mode);
 }
 
 bool PtzfStatusInfraIf::setAfTransitionSpeed(const u8_t af_transition_speed)

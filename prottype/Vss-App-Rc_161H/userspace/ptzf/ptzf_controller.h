@@ -19,7 +19,6 @@
 #include "ptzf_focus_infra_if.h"
 #include "ptzf/ptz_updater.h"
 #include "ptzf_status_infra_if.h"
-#include "ptzf_config_infra_if.h"
 #include "ptzf/ptzf_initialize_infra_if.h"
 #include "ptzf_pan_tilt_lock_infra_if.h"
 
@@ -89,7 +88,6 @@ private:
     infra::PtzfZoomInfraIf zoom_infra_if_;
     infra::PtzfFocusInfraIf focus_infra_if_;
     infra::PtzfStatusInfraIf status_infra_if_;
-    infra::PtzfConfigInfraIf config_infra_if_;
     infra::PtzfInitializeInfraIf initialize_infra_if_;
     PtzUpdater ptz_updater_;
     bool use_normal_table_;

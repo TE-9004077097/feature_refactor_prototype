@@ -23,7 +23,6 @@ public:
     PtzfConfigInfraIf();
     virtual ~PtzfConfigInfraIf();
 
-    bool setPanTiltError(const bool error);
     bool setFocusMode(const FocusMode focus_mode);
     bool setAfTransitionSpeed(const u8_t af_transition_speed);
     bool setAfSubjShiftSens(const u8_t af_subj_shift_sens);

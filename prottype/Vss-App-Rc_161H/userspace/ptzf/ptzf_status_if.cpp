@@ -737,38 +737,47 @@ void PtzfStatusIf::getFocusMode(const u32_t preset_id, FocusMode& focus_mode) co
 {
     pimpl_->status_infra_if_.getFocusMode(preset_id, focus_mode);
 }
+
 void PtzfStatusIf::getAfTransitionSpeed(const u32_t preset_id, u8_t& af_transition_speed) const
 {
     pimpl_->status_infra_if_.getAfTransitionSpeed(preset_id, af_transition_speed);
 }
+
 void PtzfStatusIf::getAfSubjShiftSens(const u32_t preset_id, u8_t& af_subj_shift_sens) const
 {
     pimpl_->status_infra_if_.getAfSubjShiftSens(preset_id, af_subj_shift_sens);
 }
+
 void PtzfStatusIf::getFocusFaceEyedetection(const u32_t preset_id, FocusFaceEyeDetectionMode& detection_mode) const
 {
     pimpl_->status_infra_if_.getFocusFaceEyedetection(preset_id, detection_mode);
 }
+
 void PtzfStatusIf::getFocusArea(const u32_t preset_id, FocusArea& focus_area) const
 {
     pimpl_->status_infra_if_.getFocusArea(preset_id, focus_area);
 }
+
 void PtzfStatusIf::getAFAreaPositionAFC(const u32_t preset_id, u16_t& position_x, u16_t& position_y) const
 {
     pimpl_->status_infra_if_.getAFAreaPositionAFC(preset_id, position_x, position_y);
 }
+
 void PtzfStatusIf::getAFAreaPositionAFS(const u32_t preset_id, u16_t& position_x, u16_t& position_y) const
 {
     pimpl_->status_infra_if_.getAFAreaPositionAFS(preset_id, position_x, position_y);
 }
+
 void PtzfStatusIf::getZoomPosition(u32_t& position) const
 {
     pimpl_->status_infra_if_.getZoomPosition(0, position);
 }
+
 void PtzfStatusIf::getZoomPosition(const u32_t preset_id, u32_t& position) const
 {
     pimpl_->status_infra_if_.getZoomPosition(preset_id, position);
 }
+
 void PtzfStatusIf::getFocusPosition(u32_t& position) const
 {
     pimpl_->status_infra_if_.getFocusPosition(0, position);
@@ -778,22 +787,27 @@ void PtzfStatusIf::getFocusPosition(const u32_t preset_id, u32_t& position) cons
 {
     pimpl_->status_infra_if_.getFocusPosition(preset_id, position);
 }
+
 bool PtzfStatusIf::isClearImageZoomOn() const
 {
     return pimpl_->status_infra_if_.isClearImageZoomOn();
 }
+
 void PtzfStatusIf::getPtMiconPowerOnCompStatus(bool& is_complete) const
 {
     return pimpl_->status_infra_if_.getPtMiconPowerOnCompStatus(is_complete);
 }
+
 void PtzfStatusIf::getPanTiltLock(bool& enable) const
 {
     pimpl_->status_infra_if_.getPanTiltLock(enable);
 }
+
 void PtzfStatusIf::getPanTiltLockControlStatus(PanTiltLockControlStatus& status) const
 {
     pimpl_->status_infra_if_.getPanTiltLockControlStatus(status);
 }
+
 void PtzfStatusIf::initializePanTiltPosition()
 {
     pimpl_->status_infra_if_.setPanTiltPosition(0, 0, 0);

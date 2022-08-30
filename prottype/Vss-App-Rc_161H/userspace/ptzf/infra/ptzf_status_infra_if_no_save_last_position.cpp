@@ -221,6 +221,11 @@ bool PtzfStatusInfraIf::getPanTiltLatestPosition(u32_t& pan, u32_t& tilt)
     return pimpl_->getPanTiltLatestPosition(pan, tilt);
 }
 
+bool PtzfStatusInfraIf::setFocusMode(const FocusMode focus_mode)
+{
+    return pimpl_->setFocusMode(focus_mode);
+}
+
 bool PtzfStatusInfraIf::setAfTransitionSpeed(const u8_t af_transition_speed)
 {
     return pimpl_->setAfTransitionSpeed(af_transition_speed);

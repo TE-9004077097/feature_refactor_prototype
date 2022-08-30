@@ -24,39 +24,6 @@
 namespace ptzf {
 namespace infra {
 
-namespace {
-
-struct FocusModeTable
-{
-    FocusMode ptzf_value;
-    visca::AutoFocus visca_value;
-} focus_mode_table[] = {
-    { FOCUS_MODE_AUTO, visca::AUTO_FOCUS_AUTO },
-    { FOCUS_MODE_MANUAL, visca::AUTO_FOCUS_MANUAL },
-};
-
-struct FocusFaceEyeDetectionModeTable
-{
-    FocusFaceEyeDetectionMode ptzf_value;
-    visca::FaceEyeDitectionAF visca_value;
-} focus_face_eye_detection_mode_table[] = {
-    { FOCUS_FACE_EYE_DETECTION_MODE_FACE_EYE_ONLY, visca::FACE_EYE_DITECTION_AF_FACE_EYE_ONLY },
-    { FOCUS_FACE_EYE_DETECTION_MODE_FACE_EYE_PRIORITY, visca::FACE_EYE_DITECTION_AF_FACE_EYE_PRIORITY },
-    { FOCUS_FACE_EYE_DETECTION_MODE_OFF, visca::FACE_EYE_DITECTION_AF_OFF },
-};
-
-struct FocusAreaTable
-{
-    FocusArea ptzf_value;
-    visca::FocusAreaMode visca_value;
-} focus_area_table[] = {
-    { FOCUS_AREA_WIDE, visca::FOCUS_AREA_MODE_WIDE },
-    { FOCUS_AREA_ZONE, visca::FOCUS_AREA_MODE_ZONE },
-    { FOCUS_AREA_FLEXIBLE_SPOT, visca::FOCUS_AREA_MODE_FLEXIBLE_SPOT },
-};
-
-} // namespace
-
 class PtzfConfigInfraIf::Impl
 {
 public:

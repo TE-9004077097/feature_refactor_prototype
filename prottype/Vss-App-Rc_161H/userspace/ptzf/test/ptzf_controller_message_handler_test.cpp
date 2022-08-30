@@ -46,7 +46,6 @@
 #include "preset/preset_status_if_mock.h"
 #include "video/video_status_if_mock.h"
 #include "ptzf/ptzf_status_if_mock.h"
-#include "ptzf/ptzf_config_if_mock.h"
 #include "ptzf/ptz_trace_status_if_mock.h"
 #include "ptzf/ptz_trace_if_mock.h"
 
@@ -2660,9 +2659,9 @@ TEST_F(PtzfControllerMessageHandlerTest, PanTiltResetSuccess)
         EXPECT_CALL(power_status_if_mock_, getPowerStatus())
             .Times(1)
             .WillRepeatedly(Return(pan_tilt_reset_param_table[i].power_status));
-        EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLock(_))
+        EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
             .Times(1)
-            .WillRepeatedly(DoAll(SetArgReferee<0>(pan_tilt_reset_param_table[i].pt_lock), Return(true)));
+            .WillRepeatedly(DoAll(SetArgReferee<0>(pan_tilt_reset_param_table[i].pt_lock), Return(ERRORCODE_SUCCESS)));
         if (pan_tilt_reset_param_table[i].call_reset) {
             EXPECT_CALL(controller_mock_, resetPanTiltPosition(_, true, _)).Times(1).WillOnce(Return());
         }
@@ -2682,9 +2681,9 @@ TEST_F(PtzfControllerMessageHandlerTest, PanTiltResetSuccess)
 TEST_F(PtzfControllerMessageHandlerTest, PanTiltResetError1)
 {
     EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(1).WillRepeatedly(Return(power::PowerStatus::POWER_OFF));
-    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLock(_))
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
         .Times(1)
-        .WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(ERRORCODE_SUCCESS)));
 
     // ### for Biz(2Way) ### //
     u32_t seq_id = U32_T(123456);
@@ -2703,9 +2702,9 @@ TEST_F(PtzfControllerMessageHandlerTest, PanTiltResetError1)
 TEST_F(PtzfControllerMessageHandlerTest, PanTiltResetError2)
 {
     EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(1).WillRepeatedly(Return(power::PowerStatus::POWER_OFF));
-    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLock(_))
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
         .Times(1)
-        .WillRepeatedly(DoAll(SetArgReferee<0>(true), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(true), Return(ERRORCODE_SUCCESS)));
 
     // ### for Biz(2Way) ### //
     u32_t seq_id = U32_T(123456);
@@ -2729,9 +2728,9 @@ TEST_F(PtzfControllerMessageHandlerTest, PanTiltReset2wayExclusive)
     PanTiltResetRequest biz_msg2;
 
     EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(2).WillRepeatedly(Return(power::PowerStatus::POWER_OFF));
-    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLock(_))
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
         .Times(2)
-        .WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(ERRORCODE_SUCCESS)));
 
     biz_msg1.seq_id = U32_T(123456);
     biz_msg1.mq_name = mq1.getName();
@@ -2756,9 +2755,9 @@ TEST_F(PtzfControllerMessageHandlerTest, PanTiltResetWithAck)
     PanTiltResetRequest request;
 
     EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(1).WillRepeatedly(Return(power::PowerStatus::POWER_ON));
-    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLock(_))
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
         .Times(1)
-        .WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(ERRORCODE_SUCCESS)));
 
     request.seq_id = U32_T(123456);
     request.mq_name = reply_mq.getName();
@@ -2774,7 +2773,6 @@ TEST_F(PtzfControllerMessageHandlerTest, PanTiltResetWithAck)
     ptzf::message::PtzfExeAck common_ack;
     reply_mq.pend(common_ack);
     EXPECT_EQ(common_ack.seq_id, request.seq_id);
-
 }
 
 TEST_F(PtzfControllerMessageHandlerTest, IfClearSuccess)
@@ -5842,7 +5840,13 @@ TEST_F(PtzfControllerMessageHandlerTest, receiveUnlockToLockEventWithPowerOn)
 {
     // PowerON中 Unlock --> Lock処理
     // (step1: Finalize処理開始)
-    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(1).WillOnce(Return(power::PowerStatus::POWER_ON));
+    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(2).WillRepeatedly(Return(power::PowerStatus::POWER_ON));
+    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLockControlStatus(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_UNLOCKED), Return(true)));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>(true), Return(ERRORCODE_SUCCESS)));
     u32_t seq_id = U32_T(123);
     u32_t seq_id_2 = U32_T(234);
     EXPECT_CALL(sequence_id_controller_mock_, createSeqId())
@@ -5879,6 +5883,13 @@ TEST_F(PtzfControllerMessageHandlerTest, receiveUnlockToLockEventWithPowerOn)
     EXPECT_CALL(initialize_infra_if_mock_, setPanTiltFunctionLimitForCamera(Eq(true))).Times(1).WillOnce(Return());
     EXPECT_CALL(pan_tilt_lock_infra_if_mock_, suppressLockStatusEvent(Eq(false), _)).Times(1).WillOnce(Return());
     EXPECT_CALL(finalize_infra_if_mock_, setPowerOffSequenceStatus(Eq(false), _)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLockControlStatus(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_LOCKED), Return(true)));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>(true), Return(ERRORCODE_SUCCESS)));
+    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(1).WillOnce(Return(power::PowerStatus::POWER_ON));
 
     visca::CompReply visca_reply(ERRORCODE_SUCCESS, seq_id_2);
     handler_->handleRequest(visca_reply);
@@ -5905,13 +5916,20 @@ TEST_F(PtzfControllerMessageHandlerTest, receiveUnlockToLockEventWithPowerOnInit
 TEST_F(PtzfControllerMessageHandlerTest, receiveUnlockToLockEventWithPowerOff)
 {
     // PowerOFF中 Unlock --> Lock処理 (制御状態更新のみ)
-    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(1).WillOnce(Return(power::PowerStatus::POWER_OFF));
+    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(3).WillRepeatedly(Return(power::PowerStatus::POWER_OFF));
     EXPECT_CALL(sequence_id_controller_mock_, createSeqId()).Times(0);
     EXPECT_CALL(finalize_infra_if_mock_, finalizePanTilt(_, _)).Times(0);
 
     EXPECT_CALL(ptzf_status_infra_if_mock_, setPanTiltLockControlStatus(Eq(PAN_TILT_LOCK_STATUS_LOCKED)))
         .Times(1)
         .WillOnce(Return(true));
+    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLockControlStatus(_))
+        .Times(2)
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_UNLOCKED), Return(true)))
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_LOCKED), Return(true)));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
+        .Times(2)
+        .WillRepeatedly(DoAll(SetArgReferee<0>(true), Return(ERRORCODE_SUCCESS)));
 
     infra::PtzfStatusInfraIf status_infra_if;
     status_infra_if.setPowerOnSequenceStatus(false);
@@ -5942,12 +5960,15 @@ TEST_F(PtzfControllerMessageHandlerTest, receiveUnlockToLockEventWithPowerProces
 TEST_F(PtzfControllerMessageHandlerTest, receiveLockToUnlockEventWithPowerOn)
 {
     // PowerON中 Lock --> Unlock処理
-    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(1).WillOnce(Return(power::PowerStatus::POWER_ON));
+    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(2).WillRepeatedly(Return(power::PowerStatus::POWER_ON));
+    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLockControlStatus(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_LOCKED), Return(true)));
     u32_t seq_id = U32_T(123);
     EXPECT_CALL(sequence_id_controller_mock_, createSeqId()).Times(1).WillOnce(Return(seq_id));
-    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLock(_))
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
         .Times(2)
-        .WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(ERRORCODE_SUCCESS)));
 
     infra::PtzfStatusInfraIf status_infra_if;
     status_infra_if.setPowerOnSequenceStatus(false);
@@ -5973,6 +5994,13 @@ TEST_F(PtzfControllerMessageHandlerTest, receiveLockToUnlockEventWithPowerOn)
         .WillOnce(Return(true));
     EXPECT_CALL(pan_tilt_lock_infra_if_mock_, suppressLockStatusEvent(Eq(false), _)).Times(1).WillOnce(Return());
     EXPECT_CALL(initialize_infra_if_mock_, setPowerOnSequenceStatus(Eq(false), _)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLockControlStatus(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_UNLOCKED_AFTER_BOOTING), Return(true)));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
+        .Times(2)
+        .WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(ERRORCODE_SUCCESS)));
+    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(1).WillOnce(Return(power::PowerStatus::POWER_ON));
 
     visca::CompReply visca_reply(ERRORCODE_SUCCESS, seq_id);
     handler_->handleRequest(visca_reply);
@@ -5981,19 +6009,24 @@ TEST_F(PtzfControllerMessageHandlerTest, receiveLockToUnlockEventWithPowerOn)
 TEST_F(PtzfControllerMessageHandlerTest, receiveLockToUnlockEventWithPowerOnCancel1)
 {
     // PowerON中 Lock --> Unlock処理
-    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(1).WillOnce(Return(power::PowerStatus::POWER_ON));
+    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(3).WillRepeatedly(Return(power::PowerStatus::POWER_ON));
     EXPECT_CALL(sequence_id_controller_mock_, createSeqId()).Times(0);
     EXPECT_CALL(visca_if_mock_, sendPowerOnPanTiltRequest(_, _)).Times(0);
 
     // * 処理中にLock状態に変更し、処理終了させる(visca処理前のタイミング)
-    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLock(_))
-        .Times(1)
-        .WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
+        .Times(3)
+        .WillOnce(DoAll(SetArgReferee<0>(false), Return(ERRORCODE_SUCCESS)))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(true), Return(ERRORCODE_SUCCESS)));
 
     // * 中断したのでLOCKEDに戻ることを確認
     EXPECT_CALL(ptzf_status_infra_if_mock_, setPanTiltLockControlStatus(Eq(PAN_TILT_LOCK_STATUS_LOCKED)))
         .Times(1)
         .WillOnce(Return(true));
+    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLockControlStatus(_))
+        .Times(2)
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_LOCKED), Return(true)))
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_LOCKED), Return(true)));
 
     infra::PtzfStatusInfraIf status_infra_if;
     status_infra_if.setPowerOnSequenceStatus(false);
@@ -6006,7 +6039,10 @@ TEST_F(PtzfControllerMessageHandlerTest, receiveLockToUnlockEventWithPowerOnCanc
 TEST_F(PtzfControllerMessageHandlerTest, receiveLockToUnlockEventWithPowerOnCancel2)
 {
     // PowerON中 Lock --> Unlock処理
-    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(1).WillOnce(Return(power::PowerStatus::POWER_ON));
+    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(2).WillRepeatedly(Return(power::PowerStatus::POWER_ON));
+    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLockControlStatus(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_LOCKED), Return(true)));
     u32_t seq_id = U32_T(123);
     u32_t seq_id_2 = U32_T(234);
     EXPECT_CALL(sequence_id_controller_mock_, createSeqId())
@@ -6015,10 +6051,11 @@ TEST_F(PtzfControllerMessageHandlerTest, receiveLockToUnlockEventWithPowerOnCanc
         .WillOnce(Return(seq_id_2));
 
     // * 処理中にLock状態に変更し、処理終了させる(visca処理完了のタイミング)
-    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLock(_))
-        .Times(2)
-        .WillOnce(DoAll(SetArgReferee<0>(false), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
+        .Times(3)
+        .WillOnce(DoAll(SetArgReferee<0>(false), Return(ERRORCODE_SUCCESS)))
+        .WillOnce(DoAll(SetArgReferee<0>(false), Return(ERRORCODE_SUCCESS)))
+        .WillOnce(DoAll(SetArgReferee<0>(true), Return(ERRORCODE_SUCCESS)));
 
     infra::PtzfStatusInfraIf status_infra_if;
     status_infra_if.setPowerOnSequenceStatus(false);
@@ -6055,6 +6092,13 @@ TEST_F(PtzfControllerMessageHandlerTest, receiveLockToUnlockEventWithPowerOnCanc
     EXPECT_CALL(initialize_infra_if_mock_, setPanTiltFunctionLimitForCamera(Eq(true))).Times(1).WillOnce(Return());
     EXPECT_CALL(pan_tilt_lock_infra_if_mock_, suppressLockStatusEvent(Eq(false), _)).Times(1).WillOnce(Return());
     EXPECT_CALL(finalize_infra_if_mock_, setPowerOffSequenceStatus(Eq(false), _)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLockControlStatus(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_LOCKED), Return(true)));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>(true), Return(ERRORCODE_SUCCESS)));
+    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(1).WillOnce(Return(power::PowerStatus::POWER_ON));
 
     visca::CompReply visca_reply_2(ERRORCODE_SUCCESS, seq_id_2);
     handler_->handleRequest(visca_reply_2);
@@ -6082,16 +6126,20 @@ TEST_F(PtzfControllerMessageHandlerTest, receiveLockToUnlockEventWithPowerOnFina
 TEST_F(PtzfControllerMessageHandlerTest, receiveLockToUnlockEventWithPowerOff)
 {
     // PowerOFF中 Lcok --> Unlock処理
-    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(1).WillOnce(Return(power::PowerStatus::POWER_OFF));
+    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(3).WillRepeatedly(Return(power::PowerStatus::POWER_OFF));
     EXPECT_CALL(sequence_id_controller_mock_, createSeqId()).Times(0);
     EXPECT_CALL(visca_if_mock_, sendPowerOnPanTiltRequest(_, _)).Times(0);
-    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLock(_))
-        .Times(1)
-        .WillOnce(DoAll(SetArgReferee<0>(false), Return(true)));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
+        .Times(3)
+        .WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(ERRORCODE_SUCCESS)));
 
     EXPECT_CALL(ptzf_status_infra_if_mock_, setPanTiltLockControlStatus(Eq(PAN_TILT_LOCK_STATUS_UNLOCKED)))
         .Times(1)
         .WillOnce(Return(true));
+    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLockControlStatus(_))
+        .Times(2)
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_LOCKED), Return(true)))
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_UNLOCKED), Return(true)));
 
     infra::PtzfStatusInfraIf status_infra_if;
     status_infra_if.setPowerOnSequenceStatus(false);
@@ -6118,6 +6166,181 @@ TEST_F(PtzfControllerMessageHandlerTest, receiveLockToUnlockEventWithPowerProces
 
     infra::PanTiltLockStatusChangedEvent event_message(true, false);
     handler_->handleRequest(event_message);
+}
+
+TEST_F(PtzfControllerMessageHandlerTest, receiveLockToUnlockFollowingUnlockToLock)
+{
+    // PowerON中 Lock --> Unlock処理
+    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(2).WillRepeatedly(Return(power::PowerStatus::POWER_ON));
+    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLockControlStatus(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_LOCKED), Return(true)));
+    const u32_t seq_id_list[] = { U32_T(123), U32_T(234), U32_T(345) };
+    EXPECT_CALL(sequence_id_controller_mock_, createSeqId())
+        .Times(ARRAY_LENGTH(seq_id_list))
+        .WillOnce(Return(seq_id_list[0]))
+        .WillOnce(Return(seq_id_list[1]))
+        .WillOnce(Return(seq_id_list[2]));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
+        .Times(2)
+        .WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(ERRORCODE_SUCCESS)));
+
+    infra::PtzfStatusInfraIf status_infra_if;
+    status_infra_if.setPowerOnSequenceStatus(false);
+    status_infra_if.setPowerOffSequenceStatus(false);
+
+    // (Initialize-step1: PT電源供給処理開始)
+    EXPECT_CALL(initialize_infra_if_mock_, setPowerOnSequenceStatus(Eq(true), _)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, suppressLockStatusEvent(Eq(true), _)).Times(1).WillOnce(Return());
+    const char_t* expected_name = PtzfControllerMQ::getUipcName();
+    const common::MessageQueue expected_mq(expected_name);
+    EXPECT_CALL(visca_if_mock_, sendPowerOnPanTiltRequest(EqNotifyMqName(expected_mq.getName()), Eq(seq_id_list[0])))
+        .Times(1)
+        .WillOnce(Return());
+
+    const infra::PanTiltLockStatusChangedEvent event_message(true, false);
+    handler_->handleRequest(event_message);
+
+    // (Initialize-step2: PT電源供給処理完了 & 制御状態更新)
+    // * 通電アンロックに遷移することを確認
+    EXPECT_CALL(ptzf_status_infra_if_mock_,
+                setPanTiltLockControlStatus(Eq(PAN_TILT_LOCK_STATUS_UNLOCKED_AFTER_BOOTING)))
+        .Times(1)
+        .WillOnce(Return(true));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, suppressLockStatusEvent(Eq(false), _)).Times(1).WillOnce(Return());
+    EXPECT_CALL(initialize_infra_if_mock_, setPowerOnSequenceStatus(Eq(false), _)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLockControlStatus(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_UNLOCKED_AFTER_BOOTING), Return(true)));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
+        .Times(2)
+        .WillOnce(DoAll(SetArgReferee<0>(false), Return(ERRORCODE_SUCCESS)))
+        .WillOnce(DoAll(SetArgReferee<0>(true), Return(ERRORCODE_SUCCESS))); // この時点でLock状態になっていることを検出
+    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(1).WillOnce(Return(power::PowerStatus::POWER_ON));
+
+    // (Finalize-step1: Finalize処理開始)
+    // * 再度ロック状態に遷移するための処理が実行されることを確認
+    EXPECT_CALL(finalize_infra_if_mock_, finalizePanTilt(EqNotifyMqName(expected_mq.getName()), Eq(seq_id_list[1])))
+        .Times(1)
+        .WillOnce(Return(true));
+
+    const visca::CompReply visca_reply_initialize(ERRORCODE_SUCCESS, seq_id_list[0]);
+    handler_->handleRequest(visca_reply_initialize);
+
+    // (Finalize-step2: Finalize処理完了 & PT電源断処理開始)
+    EXPECT_CALL(finalize_infra_if_mock_, setPowerOffSequenceStatus(Eq(true), _)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, suppressLockStatusEvent(Eq(true), _)).Times(1).WillOnce(Return());
+    EXPECT_CALL(visca_if_mock_, sendPowerOffPanTiltRequest(EqNotifyMqName(expected_mq.getName()), Eq(seq_id_list[2])))
+        .Times(1)
+        .WillOnce(Return());
+
+    const FinalizePanTiltResult comp_message_finalize(seq_id_list[1], ERRORCODE_SUCCESS);
+    handler_->handleRequest(comp_message_finalize);
+
+    // (Finalize-step3: PT電源断処理完了 & 制御状態更新)
+    EXPECT_CALL(ptzf_status_infra_if_mock_, setPanTiltLockControlStatus(Eq(PAN_TILT_LOCK_STATUS_LOCKED)))
+        .Times(1)
+        .WillOnce(Return(true));
+    EXPECT_CALL(initialize_infra_if_mock_, setPanTiltFunctionLimitForCamera(Eq(true))).Times(1).WillOnce(Return());
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, suppressLockStatusEvent(Eq(false), _)).Times(1).WillOnce(Return());
+    EXPECT_CALL(finalize_infra_if_mock_, setPowerOffSequenceStatus(Eq(false), _)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLockControlStatus(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_LOCKED), Return(true)));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>(true), Return(ERRORCODE_SUCCESS)));
+    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(1).WillOnce(Return(power::PowerStatus::POWER_ON));
+
+    const visca::CompReply visca_reply_finalize(ERRORCODE_SUCCESS, seq_id_list[2]);
+    handler_->handleRequest(visca_reply_finalize);
+}
+
+TEST_F(PtzfControllerMessageHandlerTest, receiveUnlockToLockFollowingLockToUnlock)
+{
+    // PowerON中 Unlock --> Lock処理
+    // (step1: Finalize処理開始)
+    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(2).WillRepeatedly(Return(power::PowerStatus::POWER_ON));
+    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLockControlStatus(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_UNLOCKED), Return(true)));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>(true), Return(ERRORCODE_SUCCESS)));
+    const u32_t seq_id_list[] = { U32_T(456), U32_T(567), U32_T(678) };
+    EXPECT_CALL(sequence_id_controller_mock_, createSeqId())
+        .Times(ARRAY_LENGTH(seq_id_list))
+        .WillOnce(Return(seq_id_list[0]))
+        .WillOnce(Return(seq_id_list[1]))
+        .WillOnce(Return(seq_id_list[2]));
+    const char_t* expected_name = PtzfControllerMQ::getUipcName();
+    const common::MessageQueue expected_mq(expected_name);
+    EXPECT_CALL(finalize_infra_if_mock_, finalizePanTilt(EqNotifyMqName(expected_mq.getName()), Eq(seq_id_list[0])))
+        .Times(1)
+        .WillOnce(Return(true));
+
+    infra::PtzfStatusInfraIf status_infra_if;
+    status_infra_if.setPowerOnSequenceStatus(false);
+    status_infra_if.setPowerOffSequenceStatus(false);
+
+    const infra::PanTiltLockStatusChangedEvent event_message(false, true);
+    handler_->handleRequest(event_message);
+
+    // (step2: Finalize処理完了 & PT電源断処理開始)
+    EXPECT_CALL(finalize_infra_if_mock_, setPowerOffSequenceStatus(Eq(true), _)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, suppressLockStatusEvent(Eq(true), _)).Times(1).WillOnce(Return());
+    EXPECT_CALL(visca_if_mock_, sendPowerOffPanTiltRequest(EqNotifyMqName(expected_mq.getName()), Eq(seq_id_list[1])))
+        .Times(1)
+        .WillOnce(Return());
+
+    const FinalizePanTiltResult comp_message_finalize(seq_id_list[0], ERRORCODE_SUCCESS);
+    handler_->handleRequest(comp_message_finalize);
+
+    // (step3: PT電源断処理完了 & 制御状態更新)
+    EXPECT_CALL(ptzf_status_infra_if_mock_, setPanTiltLockControlStatus(Eq(PAN_TILT_LOCK_STATUS_LOCKED)))
+        .Times(1)
+        .WillOnce(Return(true));
+    EXPECT_CALL(initialize_infra_if_mock_, setPanTiltFunctionLimitForCamera(Eq(true))).Times(1).WillOnce(Return());
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, suppressLockStatusEvent(Eq(false), _)).Times(1).WillOnce(Return());
+    EXPECT_CALL(finalize_infra_if_mock_, setPowerOffSequenceStatus(Eq(false), _)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLockControlStatus(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_LOCKED), Return(true)));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
+        .Times(2)
+        .WillOnce(
+            DoAll(SetArgReferee<0>(false), Return(ERRORCODE_SUCCESS))) // この時点でUnlock状態になっていることを検出
+        .WillOnce(DoAll(SetArgReferee<0>(false), Return(ERRORCODE_SUCCESS)));
+    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(1).WillOnce(Return(power::PowerStatus::POWER_ON));
+
+    // (step1: PT電源供給処理開始)
+    EXPECT_CALL(initialize_infra_if_mock_, setPowerOnSequenceStatus(Eq(true), _)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, suppressLockStatusEvent(Eq(true), _)).Times(1).WillOnce(Return());
+    EXPECT_CALL(visca_if_mock_, sendPowerOnPanTiltRequest(EqNotifyMqName(expected_mq.getName()), Eq(seq_id_list[2])))
+        .Times(1)
+        .WillOnce(Return());
+
+    const visca::CompReply visca_reply_finalize(ERRORCODE_SUCCESS, seq_id_list[1]);
+    handler_->handleRequest(visca_reply_finalize);
+
+    // (step2: PT電源供給処理完了 & 制御状態更新)
+    // * 通電アンロックに遷移することを確認
+    EXPECT_CALL(ptzf_status_infra_if_mock_,
+                setPanTiltLockControlStatus(Eq(PAN_TILT_LOCK_STATUS_UNLOCKED_AFTER_BOOTING)))
+        .Times(1)
+        .WillOnce(Return(true));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, suppressLockStatusEvent(Eq(false), _)).Times(1).WillOnce(Return());
+    EXPECT_CALL(initialize_infra_if_mock_, setPowerOnSequenceStatus(Eq(false), _)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(ptzf_status_infra_if_mock_, getPanTiltLockControlStatus(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>(PAN_TILT_LOCK_STATUS_UNLOCKED_AFTER_BOOTING), Return(true)));
+    EXPECT_CALL(pan_tilt_lock_infra_if_mock_, getPanTiltLock(_))
+        .Times(2)
+        .WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(ERRORCODE_SUCCESS)));
+    EXPECT_CALL(power_status_if_mock_, getPowerStatus()).Times(1).WillOnce(Return(power::PowerStatus::POWER_ON));
+
+    const visca::CompReply visca_reply_initialize(ERRORCODE_SUCCESS, seq_id_list[2]);
+    handler_->handleRequest(visca_reply_initialize);
 }
 
 #pragma GCC diagnostic warning "-Wconversion"

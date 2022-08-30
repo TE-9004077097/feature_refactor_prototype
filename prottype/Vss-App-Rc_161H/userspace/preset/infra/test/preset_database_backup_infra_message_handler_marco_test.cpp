@@ -20,7 +20,6 @@
 #include "ptp/ptp_device_property.h"
 #include "ptp/ptp_error.h"
 #include "ptzf/ptzf_status_if_mock.h"
-#include "ptzf/ptzf_config_if_mock.h"
 #include "ptp/ptp_command_data.h"
 #include "visca/visca_server_message_if_mock.h"
 #include "visca/visca_server_ptzf_if_mock.h"
@@ -46,13 +45,13 @@ namespace preset {
 namespace infra {
 
 // + setPresetSuccess
-//   - SetPreset¬Œ÷
+//   - SetPresetæˆåŠŸ
 // + setPresetZoomPositionFailure
-//   - ZoomPositionSettingƒGƒ‰[ŒãFocusPositionSetting
+//   - ZoomPositionSettingã‚¨ãƒ©ãƒ¼å¾ŒFocusPositionSetting
 // + setPresetFocusCommandFailure
-//   - FocusŠÖ˜AƒRƒ}ƒ“ƒh‚·‚×‚ÄƒGƒ‰[ŒãZoomPositionSetting
+//   - Focusé–¢é€£ã‚³ãƒãƒ³ãƒ‰ã™ã¹ã¦ã‚¨ãƒ©ãƒ¼å¾ŒZoomPositionSetting
 // + setPresetAllCommandFailure
-//   - ƒRƒ}ƒ“ƒh‚·‚×‚ÄƒGƒ‰[ŒãSetPresetResult‚ğ•Ô‹p
+//   - ã‚³ãƒãƒ³ãƒ‰ã™ã¹ã¦ã‚¨ãƒ©ãƒ¼å¾ŒSetPresetResultã‚’è¿”å´
 
 class PresetDatabaseBackupInfraMessageHandlerTest : public ::testing::Test
 {
@@ -61,7 +60,6 @@ protected:
         : ptp_driver_if_mock_holder_(),
           ptp_driver_if_mock_(ptp_driver_if_mock_holder_.getMock()),
           ptzf_mock_holder_object_(),
-          ptzf_mock_holder_object_config_(),
           ptzf_status_if_mock_(ptzf_mock_holder_object_.getMock()),
           visca_ptzf_if_mock_holder_object(),
           visca_ptzf_if_mock_(visca_ptzf_if_mock_holder_object.getMock()),
@@ -85,7 +83,7 @@ protected:
         reply_.unlink();
     }
 #ifdef TEST_STATUS
-    //TODO ƒeƒXƒg–¢À‘•BÀ‘•‚Í‹°‚ç‚­ˆÈ‰º‚ğÀsBi‚»‚ÌÛAptzf_config_if_mock_‚Í“KØ‚È’l‚É‘‚«Š·‚¦‚éj
+    //TODO ãƒ†ã‚¹ãƒˆæœªå®Ÿè£…ã€‚å®Ÿè£…æ™‚ã¯æã‚‰ãä»¥ä¸‹ã‚’å®Ÿè¡Œã€‚ï¼ˆãã®éš›ã€ptzf_config_if_mock_ã¯é©åˆ‡ãªå€¤ã«æ›¸ãæ›ãˆã‚‹ï¼‰
     void setPtzfStatusParameters()
     {
         // SetFocusMode
@@ -120,7 +118,6 @@ protected:
     MockHolderObject<ptp::driver::PtpDriverCommandIfMock> ptp_driver_if_mock_holder_;
     ptp::driver::PtpDriverCommandIfMock& ptp_driver_if_mock_;
     MockHolderObject<ptzf::PtzfStatusIfMock> ptzf_mock_holder_object_;
-    MockHolderObject<ptzf::PtzfConfigIfMock> ptzf_mock_holder_object_config_;
     ptzf::PtzfStatusIfMock& ptzf_status_if_mock_;
     MockHolderObject<visca::ViscaServerPtzfIfMock> visca_ptzf_if_mock_holder_object;
     visca::ViscaServerPtzfIfMock& visca_ptzf_if_mock_;

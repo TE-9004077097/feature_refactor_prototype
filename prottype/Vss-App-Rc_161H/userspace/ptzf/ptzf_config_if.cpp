@@ -25,13 +25,10 @@ namespace ptzf {
 
 struct PtzfConfigIf::Impl
 {
-    Impl() : config_infra_if_(), value_manager_(), capability_infra_if_(), backup_infra_if_()
+    Impl() : config_infra_if_()
     {}
 
     infra::PtzfConfigInfraIf config_infra_if_;
-    PanTiltValueManager value_manager_;
-    infra::CapabilityInfraIf capability_infra_if_;
-    infra::PtzfBackupInfraIf backup_infra_if_;
 };
 
 PtzfConfigIf::PtzfConfigIf() : pimpl_(new Impl)

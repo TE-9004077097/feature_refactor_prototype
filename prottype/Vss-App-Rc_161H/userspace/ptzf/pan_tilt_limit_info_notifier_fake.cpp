@@ -7,7 +7,6 @@
 #include "ptzf/pan_tilt_limit_info_notifier.h"
 #include "common_event_source.h"
 #include "ptzf/ptzf_status_if.h"
-#include "ptzf/ptzf_config_if.h"
 
 namespace ptzf {
 

@@ -16,7 +16,6 @@
 #include "visca/visca_server_ptzf_if_mock.h"
 #include "ptzf/ptzf_biz_message_if_mock.h"
 #include "ptzf/ptzf_status_if_mock.h"
-#include "ptzf/ptzf_config_if_mock.h"
 #include "ptzf_capability_infra_if_mock.h"
 #include "ptzf_pan_tilt_infra_if_mock.h"
 #include "ptzf_zoom_infra_if_mock.h"
@@ -24,7 +23,6 @@
 #include "ptz_updater_mock.h"
 #include "ptzf_controller_message_handler.h"
 #include "ptzf_status_infra_if_mock.h"
-#include "ptzf_config_infra_if_mock.h"
 #include "ptzf/ptzf_initialize_infra_if_mock.h"
 #include "ptzf/ptzf_common_message.h"
 
@@ -248,8 +246,6 @@ protected:
           visca_ptzf_if_mock_(visca_ptzf_if_mock_holder_.getMock()),
           ptzf_status_if_mock_holder_(),
           ptzf_status_if_mock_(ptzf_status_if_mock_holder_.getMock()),
-          ptzf_config_if_mock_holder_(),
-          ptzf_config_if_mock_(ptzf_config_if_mock_holder_.getMock()),
           ptzf_biz_message_if_mock_holder_(),
           ptzf_biz_message_if_mock_(ptzf_biz_message_if_mock_holder_.getMock()),
           ptz_updater_mock_holder_(),
@@ -262,8 +258,6 @@ protected:
           ptzf_focus_if_mock_(ptzf_focus_if_mock_holder_.getMock()),
           ptzf_status_infra_if_mock_holder_(),
           ptzf_status_infra_if_mock_(ptzf_status_infra_if_mock_holder_.getMock()),
-          ptzf_config_infra_if_mock_holder_(),
-          ptzf_config_infra_if_mock_(ptzf_config_infra_if_mock_holder_.getMock()),
           ptzf_initialize_if_mock_holder_(),
           ptzf_initialize_if_mock_(ptzf_initialize_if_mock_holder_.getMock())
     {}
@@ -295,8 +289,6 @@ protected:
     visca::ViscaServerPtzfIfMock& visca_ptzf_if_mock_;
     MockHolderObject<PtzfStatusIfMock> ptzf_status_if_mock_holder_;
     PtzfStatusIfMock& ptzf_status_if_mock_;
-    MockHolderObject<PtzfConfigIfMock> ptzf_config_if_mock_holder_;
-    PtzfConfigIfMock& ptzf_config_if_mock_;
     MockHolderObject<ptzf::PtzfBizMessageIfMock> ptzf_biz_message_if_mock_holder_;
     ptzf::PtzfBizMessageIfMock& ptzf_biz_message_if_mock_;
     MockHolderObject<PtzUpdaterImpl> ptz_updater_mock_holder_;
@@ -309,8 +301,6 @@ protected:
     infra::PtzfFocusInfraIfMock& ptzf_focus_if_mock_;
     MockHolderObject<infra::PtzfStatusInfraIfMock> ptzf_status_infra_if_mock_holder_;
     infra::PtzfStatusInfraIfMock& ptzf_status_infra_if_mock_;
-    MockHolderObject<infra::PtzfConfigInfraIfMock> ptzf_config_infra_if_mock_holder_;
-    infra::PtzfConfigInfraIfMock& ptzf_config_infra_if_mock_;
     MockHolderObject<infra::PtzfInitializeInfraIfMock> ptzf_initialize_if_mock_holder_;
     infra::PtzfInitializeInfraIfMock& ptzf_initialize_if_mock_;
 

@@ -8,8 +8,6 @@
 
 #include "ptzf/ptzf_status_if.h"
 #include "ptzf/ptzf_status_if_mock.h"
-#include "ptzf/ptzf_config_if.h"
-#include "ptzf/ptzf_config_if_mock.h"
 #include "visca/dboutputs/enum.h"
 
 #include "gmock/gmock.h"

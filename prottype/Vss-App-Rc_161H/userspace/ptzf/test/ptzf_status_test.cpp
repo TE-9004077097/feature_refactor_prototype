@@ -7,7 +7,6 @@
 #include "types.h"
 
 #include "ptzf/ptzf_status_if.h"
-#include "ptzf/ptzf_config_if.h"
 #include "ptzf_status.h"
 #include "ptzf_backup_infra_if_mock.h"
 #include "common_message_queue.h"
@@ -26,7 +25,6 @@
 #include "bizglobal_modelname_creater.h"
 #include "ptzf_capability_infra_if.h"
 #include "ptzf_status_infra_if_mock.h"
-#include "ptzf_config_infra_if_mock.h"
 
 using ::testing::_;
 using ::testing::Return;

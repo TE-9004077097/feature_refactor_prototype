@@ -6,7 +6,6 @@
 
 #include "pan_tilt_value_manager.h"
 #include "ptzf/ptzf_status_if.h"
-#include "ptzf/ptzf_config_if.h"
 #include "ptzf_trace.h"
 
 namespace ptzf {

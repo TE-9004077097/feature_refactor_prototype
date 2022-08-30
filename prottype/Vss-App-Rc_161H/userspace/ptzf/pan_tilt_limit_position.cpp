@@ -7,7 +7,6 @@
 #include "types.h"
 
 #include "ptzf/ptzf_status_if.h"
-#include "ptzf/ptzf_config_if.h"
 #include "visca/dboutputs/enum.h"
 
 #include "ptzf/pan_tilt_limit_position.h"

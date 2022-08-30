@@ -48,7 +48,6 @@
 #include "ptzf_pan_tilt_lock_infra_if.h"
 #include "ptzf/ptzf_message_if.h"
 #include "ptzf_status_infra_if.h"
-#include "ptzf_config_infra_if.h"
 #include "power/power_status_if.h"
 
 #include "bizglobal.h"
@@ -251,7 +250,8 @@ PtzfControllerMessageHandler::PtzfControllerMessageHandler()
       pt_finalizing_status_(PanTiltFinalizingProcessingStatus::NONE),
       initializing_seq_id_(INVALID_SEQ_ID),
       finalizing_seq_id_(INVALID_SEQ_ID),
-      seq_controller_()
+      seq_controller_(),
+      pt_transition_executing_(false)
 {
     common::Log::printBootTimeTagBegin("PtzfCtrl init");
 
@@ -735,22 +735,7 @@ void PtzfControllerMessageHandler::doHandleRequest(const SetAfSubjShiftSensReque
         config_if.setAfSubjShiftSens(msg.af_subj_shift_sens);
     }
 }
-#if 0
-void PtzfControllerMessageHandler::doHandleRequest(const SetFocusFaceEyeDetectionModeRequest& msg)
-{
-    PtzfConfigIf config_if;
 
-    PTZF_VTRACE(msg.seq_id, msg.focus_face_eye_detection_mode, 0);
-
-    if (!msg.reply_name.isValid()) {
-        config_if.setFocusFaceEyedetection(msg.focus_face_eye_detection_mode);
-    }
-    else {
-        common::MessageQueue mq(msg.reply_name.name);
-        config_if.setFocusFaceEyedetection(msg.focus_face_eye_detection_mode);
-    }
-}
-#endif
 void PtzfControllerMessageHandler::doHandleRequest(const FocusAreaRequest& msg)
 {
     PtzfConfigIf config_if;
@@ -866,7 +851,7 @@ void PtzfControllerMessageHandler::doHandleRequest(const PanTiltResetRequest& ms
     PTZF_VTRACE(msg.seq_id, msg.mode_checked, msg.need_ack);
 
     bool lock_status;
-    status_infra_if_.getPanTiltLock(lock_status);
+    pan_tilt_lock_infra_if_.getPanTiltLock(lock_status);
     power::PowerStatusIf power_status_if;
     power::PowerStatus power_status = power_status_if.getPowerStatus();
     if (lock_status || (power_status == power::PowerStatus::PROCESSING_ON)
@@ -1981,20 +1966,13 @@ void PtzfControllerMessageHandler::doHandleRequest(const SetFocusAFModeRequest& 
     PTZF_VTRACE(msg.seq_id, msg.mode, 0);
     focus_infra_if_.setFocusAFMode(msg.mode, msg.mq_name, msg.seq_id);
 }
-#if 1
+
 void PtzfControllerMessageHandler::doHandleRequest(const SetFocusFaceEyeDetectionModeRequest& msg)
 {
     PTZF_VTRACE(msg.seq_id, msg.focus_face_eye_detection_mode, 0);
     focus_infra_if_.setFocusFaceEyedetection(msg.focus_face_eye_detection_mode, msg.reply_name, msg.seq_id);
 }
-#else
-void PtzfControllerMessageHandler::doHandleRequest(const SetFocusFaceEyeDetectionModeRequest& msg)
-{
-    PtzfConfigIf config_if;
-    PTZF_VTRACE(msg.seq_id, msg.focus_face_eye_detection_mode, 0);
-    config_if.setFocusFaceEyedetection(msg.focus_face_eye_detection_mode);
-}
-#endif
+
 void PtzfControllerMessageHandler::doHandleRequest(const SetAfAssistRequest& msg)
 {
     PTZF_VTRACE(msg.seq_id, msg.on_off, 0);
@@ -2362,11 +2340,14 @@ void PtzfControllerMessageHandler::doHandleRequest(const bizglobal::PtpAvailabil
 
 void PtzfControllerMessageHandler::doHandleRequest(const infra::PanTiltLockStatusChangedEvent& msg)
 {
+    PTZF_VTRACE(msg.previous_lock_status, msg.current_lock_status, 0);
+
     // 現在の電源状態を取得
     // 起動処理中・停止処理中の場合は、状態遷移を行わない
     power::PowerStatusIf power_status_if;
     power::PowerStatus power_status = power_status_if.getPowerStatus();
     if ((power_status == power::PowerStatus::PROCESSING_ON) || (power_status == power::PowerStatus::PROCESSING_OFF)) {
+        PTZF_VTRACE(power_status, 0, 0);
         return;
     }
 
@@ -2376,28 +2357,22 @@ void PtzfControllerMessageHandler::doHandleRequest(const infra::PanTiltLockStatu
     status_infra_if_.getPowerOnSequenceStatus(is_initializing);
     status_infra_if_.getPowerOffSequenceStatus(is_finalizing);
     if (is_initializing || is_finalizing) {
+        PTZF_VTRACE(is_initializing, is_finalizing, 0);
+        return;
+    }
+    const bool executing = getPanTiltLockTransitionExecuting();
+    if (executing) {
+        PTZF_VTRACE(executing, 0, 0);
         return;
     }
 
-    if ((msg.previous_lock_status == true) && (msg.current_lock_status == false)) {
-        if (power_status == power::PowerStatus::POWER_ON) {
-            // PowerON中 Lock --> Unlock処理 (step1: PT電源供給処理開始)
-            handleLockToUnlockWithPowerOnPTPowerOn();
-        }
-        else {
-            // PowerOFF中 Lock --> Unlock処理 (制御状態更新のみ)
-            handleLockToUnlockWithPowerOffDone();
-        }
+    PanTiltLockHandlerFunc next_func = getPtLockFuncNext();
+    if (next_func) {
+        setPanTiltLockTransitionExecuting(true);
+        (this->*next_func)();
     }
-    else if ((msg.previous_lock_status == false) && (msg.current_lock_status == true)) {
-        if (power_status == power::PowerStatus::POWER_ON) {
-            // PowerON中 Unlock --> Lock処理 (step1: Finalize処理開始)
-            handleUnlockToLockWithPowerOnFinalize();
-        }
-        else {
-            // PowerOFF中 Unlock --> Lock処理 (制御状態更新のみ)
-            handleUnlockToLockWithPowerOffDone();
-        }
+    else {
+        setPanTiltLockTransitionExecuting(false);
     }
 }
 
@@ -2484,6 +2459,15 @@ void PtzfControllerMessageHandler::handleUnlockToLockWithPowerOnDone()
     infra::PtzfFinalizeInfraIf finalize_infra_if;
     finalize_infra_if.setPowerOffSequenceStatus(false, reply_mq.getName());
     reply_mq.pend(comp_message);
+
+    PanTiltLockHandlerFunc next_func = getPtLockFuncNext();
+    if (next_func) {
+        setPanTiltLockTransitionExecuting(true);
+        (this->*next_func)();
+    }
+    else {
+        setPanTiltLockTransitionExecuting(false);
+    }
 }
 
 // PowerOFF中 Unlock --> Lock処理 (制御状態更新のみ)
@@ -2498,6 +2482,15 @@ void PtzfControllerMessageHandler::handleUnlockToLockWithPowerOffDone()
     PTZF_VTRACE_RECORD(next_control_state, 0, 0);
     PtzfStatus ptzf_statis;
     ptzf_statis.setPanTiltLockControlStatus(next_control_state);
+
+    PanTiltLockHandlerFunc next_func = getPtLockFuncNext();
+    if (next_func) {
+        setPanTiltLockTransitionExecuting(true);
+        (this->*next_func)();
+    }
+    else {
+        setPanTiltLockTransitionExecuting(false);
+    }
 }
 
 // PowerON中 Lock --> Unlock処理 (step1: PT電源供給処理開始)
@@ -2509,7 +2502,7 @@ void PtzfControllerMessageHandler::handleLockToUnlockWithPowerOnPTPowerOn()
     // 現在のLock/Unlock状態がUNLOCKであることを再確認
     infra::PtzfStatusInfraIf status_infra_if;
     bool current_lock_status = false;
-    status_infra_if.getPanTiltLock(current_lock_status);
+    pan_tilt_lock_infra_if_.getPanTiltLock(current_lock_status);
     if (current_lock_status) {
         // LOCKされているのでLOCK状態への状態遷移を行う
         handleAbortLockToUnlockDone();
@@ -2542,7 +2535,7 @@ void PtzfControllerMessageHandler::handleLockToUnlockWithPowerOnDone()
     // 現在のLock/Unlock状態がUNLOCKであることを再確認
     infra::PtzfStatusInfraIf status_infra_if;
     bool current_lock_status = false;
-    status_infra_if.getPanTiltLock(current_lock_status);
+    pan_tilt_lock_infra_if_.getPanTiltLock(current_lock_status);
     if (current_lock_status) {
         // LOCKされているのでPTブロックの電源断処理とLOCK状態への遷移を行う
         handleAbortLockToUnlockPTPowerOff();
@@ -2565,6 +2558,15 @@ void PtzfControllerMessageHandler::handleLockToUnlockWithPowerOnDone()
     infra::PtzfInitializeInfraIf initialize_infra_if;
     initialize_infra_if.setPowerOnSequenceStatus(false, reply_mq.getName());
     reply_mq.pend(comp_message);
+
+    PanTiltLockHandlerFunc next_func = getPtLockFuncNext();
+    if (next_func) {
+        setPanTiltLockTransitionExecuting(true);
+        (this->*next_func)();
+    }
+    else {
+        setPanTiltLockTransitionExecuting(false);
+    }
 }
 
 // PowerON中 Lock --> Unlock処理 (制御状態更新のみ)
@@ -2576,7 +2578,7 @@ void PtzfControllerMessageHandler::handleLockToUnlockWithPowerOffDone()
     // 現在のLock/Unlock状態がUNLOCKであることを再確認
     infra::PtzfStatusInfraIf status_infra_if;
     bool current_lock_status = false;
-    status_infra_if.getPanTiltLock(current_lock_status);
+    pan_tilt_lock_infra_if_.getPanTiltLock(current_lock_status);
     if (current_lock_status) {
         // LOCKされている場合は状態遷移しない
         return;
@@ -2587,6 +2589,15 @@ void PtzfControllerMessageHandler::handleLockToUnlockWithPowerOffDone()
     PTZF_VTRACE_RECORD(next_control_state, 0, 0);
     PtzfStatus ptzf_status;
     ptzf_status.setPanTiltLockControlStatus(next_control_state);
+
+    PanTiltLockHandlerFunc next_func = getPtLockFuncNext();
+    if (next_func) {
+        setPanTiltLockTransitionExecuting(true);
+        (this->*next_func)();
+    }
+    else {
+        setPanTiltLockTransitionExecuting(false);
+    }
 }
 
 void PtzfControllerMessageHandler::handleAbortLockToUnlockPTPowerOff()
@@ -2616,6 +2627,100 @@ void PtzfControllerMessageHandler::handleAbortLockToUnlockDone()
     PTZF_VTRACE_RECORD(next_control_state, 0, 0);
     PtzfStatus ptzf_status;
     ptzf_status.setPanTiltLockControlStatus(next_control_state);
+
+    PanTiltLockHandlerFunc next_func = getPtLockFuncNext();
+    if (next_func) {
+        setPanTiltLockTransitionExecuting(true);
+        (this->*next_func)();
+    }
+    else {
+        setPanTiltLockTransitionExecuting(false);
+    }
+}
+
+PtzfControllerMessageHandler::PanTiltLockHandlerFunc PtzfControllerMessageHandler::getPtLockFuncNext()
+{
+    PanTiltLockControlStatus lock_control_status(PAN_TILT_LOCK_STATUS_NONE);
+    const bool control_status_result = status_infra_if_.getPanTiltLockControlStatus(lock_control_status);
+    if (!control_status_result) {
+        PTZF_VTRACE_ERROR_RECORD(control_status_result, 0, 0);
+        return nullptr;
+    }
+
+    bool lock_status(false);
+    const ErrorCode status_result = pan_tilt_lock_infra_if_.getPanTiltLock(lock_status);
+    if (status_result != ERRORCODE_SUCCESS) {
+        PTZF_VTRACE_ERROR_RECORD(status_result, 0, 0);
+        return nullptr;
+    }
+
+    power::PowerStatusIf power_status_if;
+    const power::PowerStatus power_status = power_status_if.getPowerStatus();
+    if ((power_status == power::PowerStatus::PROCESSING_ON) || (power_status == power::PowerStatus::PROCESSING_OFF)) {
+        return nullptr;
+    }
+
+    PTZF_VTRACE_RECORD(lock_control_status, lock_status, power_status);
+
+    PanTiltLockHandlerFunc ret_func(nullptr);
+    if (lock_status) {
+        // Current GPIO status is Locked
+        switch (lock_control_status) {
+        case PAN_TILT_LOCK_STATUS_NONE:
+        case PAN_TILT_LOCK_STATUS_UNLOCKED:
+        case PAN_TILT_LOCK_STATUS_UNLOCKED_AFTER_BOOTING:
+            // Unlock --> Lock
+            if (power::PowerStatus::POWER_ON == power_status) {
+                ret_func = &PtzfControllerMessageHandler::handleUnlockToLockWithPowerOnFinalize;
+            }
+            else {
+                ret_func = &PtzfControllerMessageHandler::handleUnlockToLockWithPowerOffDone;
+            }
+            break;
+        case PAN_TILT_LOCK_STATUS_LOCKED:
+            // Already locked
+            ret_func = nullptr;
+            break;
+        default:
+            PTZF_VTRACE_ERROR_RECORD(lock_control_status, 0, 0);
+            ret_func = nullptr;
+            break;
+        }
+    }
+    else {
+        // Current GPIO status is unlocked
+        switch (lock_control_status) {
+        case PAN_TILT_LOCK_STATUS_NONE:
+        case PAN_TILT_LOCK_STATUS_LOCKED:
+            // Lock --> Unlock
+            if (power::PowerStatus::POWER_ON == power_status) {
+                ret_func = &PtzfControllerMessageHandler::handleLockToUnlockWithPowerOnPTPowerOn;
+            }
+            else {
+                ret_func = &PtzfControllerMessageHandler::handleLockToUnlockWithPowerOffDone;
+            }
+            break;
+        case PAN_TILT_LOCK_STATUS_UNLOCKED:
+        case PAN_TILT_LOCK_STATUS_UNLOCKED_AFTER_BOOTING:
+            // Already unlocked
+            ret_func = nullptr;
+            break;
+        default:
+            PTZF_VTRACE_ERROR_RECORD(lock_control_status, 0, 0);
+            ret_func = nullptr;
+            break;
+        }
+    }
+    return ret_func;
+}
+
+void PtzfControllerMessageHandler::setPanTiltLockTransitionExecuting(const bool status)
+{
+    pt_transition_executing_ = status;
+}
+bool PtzfControllerMessageHandler::getPanTiltLockTransitionExecuting()
+{
+    return pt_transition_executing_;
 }
 
 } // namespace ptzf

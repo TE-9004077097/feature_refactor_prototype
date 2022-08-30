@@ -18,7 +18,6 @@
 #include "ptp/ptp_device_property.h"
 #include "ptp/ptp_error.h"
 #include "ptzf/ptzf_status_if_mock.h"
-#include "ptzf/ptzf_config_if_mock.h"
 #include "ptp/ptp_command_data.h"
 #include "visca/visca_server_message_if_mock.h"
 #include "visca/visca_server_ptzf_if_mock.h"
