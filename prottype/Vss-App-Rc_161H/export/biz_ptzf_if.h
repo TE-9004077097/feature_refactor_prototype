@@ -14,7 +14,6 @@
 #include "gtl_string.h"
 #include "common_select.h"
 #include "common_message_queue.h"
-#include "ptzf/ptzf_parameter.h"
 
 namespace biz_ptzf {
 

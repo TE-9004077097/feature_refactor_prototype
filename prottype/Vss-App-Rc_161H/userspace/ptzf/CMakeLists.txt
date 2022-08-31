@@ -25,7 +25,6 @@ cxx_gmock_executable(power_status_event_listener_ptzf_on_boot_test
   "${power_status_event_listener_ptzf_on_boot_test_libs}"
   test/power_status_event_listener_ptzf_on_boot_test.cpp)
 add_library_tests(ptzf_controller_entry power_status_event_listener_ptzf_on_boot_test)
-
 list(APPEND ptzf_controller_message_handler_libs ptzf_status)
 list(APPEND ptzf_controller_message_handler_libs ptzf_config)
 list(APPEND ptzf_controller_message_handler_libs error_notifier_message_if)
@@ -377,7 +376,7 @@ list(APPEND ptzf_controller_test_libs video_status_if_mock)
 list(APPEND ptzf_controller_test_libs menu_status_mock)
 list(APPEND ptzf_controller_test_libs ptz_trace_status_if_mock)
 list(APPEND ptzf_controller_test_libs camera_osd_status_if_mock)
-#list(APPEND ptzf_controller_test_libs ptzf_controller_message_handler)
+list(APPEND ptzf_controller_test_libs ptzf_controller_message_handler)
 cxx_gmock_executable(ptzf_controller_test
   "${ptzf_controller_test_libs}"
   test/ptzf_controller_test.cpp
