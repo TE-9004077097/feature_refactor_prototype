@@ -239,6 +239,7 @@ PtzfControllerMessageHandler::PtzfControllerMessageHandler()
       ptz_trace_thread_mq_(PtzTraceControllerThreadMQ::getName()),
       ptz_trace_controller_(recv_, ptz_trace_thread_mq_),
       status_infra_if_(),
+      config_if_(),
       pan_tilt_infra_if_(),
       zoom_infra_if_(),
       focus_infra_if_(),
@@ -708,106 +709,92 @@ void PtzfControllerMessageHandler::doHandleRequest(const FocusModeRequest& msg)
 
 void PtzfControllerMessageHandler::doHandleRequest(const SetAfTransitionSpeedRequest& msg)
 {
-    PtzfConfigIf config_if;
-
     PTZF_VTRACE(msg.seq_id, msg.af_transition_speed, 0);
 
     if (!msg.mq_name.isValid()) {
-        config_if.setAfTransitionSpeed(msg.af_transition_speed);
+        config_if_.setAfTransitionSpeed(msg.af_transition_speed);
     }
     else {
         common::MessageQueue mq(msg.mq_name.name);
-        config_if.setAfTransitionSpeed(msg.af_transition_speed);
+        config_if_.setAfTransitionSpeed(msg.af_transition_speed);
     }
 }
 
 void PtzfControllerMessageHandler::doHandleRequest(const SetAfSubjShiftSensRequest& msg)
 {
-    PtzfConfigIf config_if;
-
     PTZF_VTRACE(msg.seq_id, msg.af_subj_shift_sens, 0);
 
     if (!msg.mq_name.isValid()) {
-        config_if.setAfSubjShiftSens(msg.af_subj_shift_sens);
+        config_if_.setAfSubjShiftSens(msg.af_subj_shift_sens);
     }
     else {
         common::MessageQueue mq(msg.mq_name.name);
-        config_if.setAfSubjShiftSens(msg.af_subj_shift_sens);
+        config_if_.setAfSubjShiftSens(msg.af_subj_shift_sens);
     }
 }
 
 void PtzfControllerMessageHandler::doHandleRequest(const FocusAreaRequest& msg)
 {
-    PtzfConfigIf config_if;
-
     PTZF_VTRACE(msg.seq_id, msg.focusarea, 0);
 
     if (!msg.mq_name.isValid()) {
-        config_if.setFocusArea(msg.focusarea);
+        config_if_.setFocusArea(msg.focusarea);
     }
     else {
         common::MessageQueue mq(msg.mq_name.name);
-        config_if.setFocusArea(msg.focusarea);
+        config_if_.setFocusArea(msg.focusarea);
     }
 }
 
 void PtzfControllerMessageHandler::doHandleRequest(const AFAreaPositionAFCRequest& msg)
 {
-    PtzfConfigIf config_if;
-
     //PTZF_VTRACE(msg.seq_id, msg.position_x, msg.position_y, 0);
 
     if (!msg.mq_name.isValid()) {
-        config_if.setAFAreaPositionAFC(msg.positionx, msg.positiony);
+        config_if_.setAFAreaPositionAFC(msg.positionx, msg.positiony);
     }
     else {
         common::MessageQueue mq(msg.mq_name.name);
-        config_if.setAFAreaPositionAFC(msg.positionx, msg.positiony);
+        config_if_.setAFAreaPositionAFC(msg.positionx, msg.positiony);
     }
 }
 
 void PtzfControllerMessageHandler::doHandleRequest(const AFAreaPositionAFSRequest& msg)
 {
-    PtzfConfigIf config_if;
-
     //PTZF_VTRACE(msg.seq_id, msg.position_x, msg.position_y, 0);
 
     if (!msg.mq_name.isValid()) {
-        config_if.setAFAreaPositionAFS(msg.positionx, msg.positiony);
+        config_if_.setAFAreaPositionAFS(msg.positionx, msg.positiony);
     }
     else {
         common::MessageQueue mq(msg.mq_name.name);
-        config_if.setAFAreaPositionAFS(msg.positionx, msg.positiony);
+        config_if_.setAFAreaPositionAFS(msg.positionx, msg.positiony);
     }
 }
 
 void PtzfControllerMessageHandler::doHandleRequest(const ZoomPositionRequest& msg)
 {
-    PtzfConfigIf config_if;
-
     PTZF_VTRACE(msg.seq_id, msg.pos, 0);
 
     if (!msg.mq_name.isValid()) {
-        config_if.setZoomPosition(msg.pos);
+        config_if_.setZoomPosition(msg.pos);
     }
     else {
         common::MessageQueue mq(msg.mq_name.name);
-        config_if.setZoomPosition(msg.pos);
+        config_if_.setZoomPosition(msg.pos);
     }
 }
 
 void PtzfControllerMessageHandler::doHandleRequest(const FocusPositionRequest& msg)
 {
-    PtzfConfigIf config_if;
-
     PTZF_VTRACE(msg.seq_id, msg.pos, 0);
 
     if (!msg.mq_name.isValid()) {
-        config_if.setFocusPosition(msg.pos);
+        config_if_.setFocusPosition(msg.pos);
     }
     else {
         common::MessageQueue mq(msg.mq_name.name);
-        config_if.setFocusPosition(msg.pos);
+        config_if_.setFocusPosition(msg.pos);
     }
 }
 
@@ -2325,7 +2312,7 @@ void PtzfControllerMessageHandler::doHandleRequest(const bizglobal::PanTiltAccel
 
 void PtzfControllerMessageHandler::doHandleRequest(const bizglobal::PtMiconPowerOnCompStatus& msg)
 {
-    status_infra_if_.setPtMiconPowerOnCompStatus(msg.is_completed_);
+    config_if_.setPtMiconPowerOnCompStatus(msg.is_completed_);
 }
 
 void PtzfControllerMessageHandler::doHandleRequest(const bizglobal::PtpAvailability& msg)

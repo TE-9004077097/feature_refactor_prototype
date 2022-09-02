@@ -40,6 +40,8 @@ namespace application {
 namespace {
 const common::Log::PrintFunc& pf(common::Log::instance().getPrintFunc());
 
+const std::vector<common::Task::Affinity> cpu_ids = { APPRC_CPU_AFFINITY };
+
 void waitRebootRequest()
 {
     common::MessageQueue mq(ApplicationManagerMainMessageHandler::getName());
@@ -53,9 +55,6 @@ void waitRebootRequest()
 void setDefaultThreadPriorityAndAffinity()
 {
     common::Task::setPriority(common::Task::PRIORITY_NORMAL);
-    std::vector<common::Task::Affinity> cpu_ids;
-    cpu_ids.push_back(common::Task::AFFINITY_CPU0);
-    cpu_ids.push_back(common::Task::AFFINITY_CPU1);
     common::Task::setAffinity(cpu_ids);
 }
 

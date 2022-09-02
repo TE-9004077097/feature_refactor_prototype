@@ -450,8 +450,8 @@ public:
     bool setPTZTraceDelete(const u32_t trace_id, const u32_t seq_id = DEFAULT_SEQ_ID);
     bool setStandbyMode(const StandbyMode standby_mode, const u32_t seq_id = DEFAULT_SEQ_ID);
     bool setName(const TraceName& name, const u32_t seq_id = DEFAULT_SEQ_ID);
-    bool setFocusMode(const FocusMode focus_mode, const u32_t seq_id = DEFAULT_SEQ_ID);
-    bool setFocusArea(const FocusArea focus_area, const u32_t seq_id = DEFAULT_SEQ_ID);
+    bool setFocusMode(const uint8_t focus_mode, const u32_t seq_id = DEFAULT_SEQ_ID);
+    bool setFocusArea(const uint8_t focus_area, const u32_t seq_id = DEFAULT_SEQ_ID);
     bool setAFAreaPositionAFC(const u16_t position_x, const u16_t position_y, const u32_t seq_id = DEFAULT_SEQ_ID);
     bool setAFAreaPositionAFS(const u16_t position_x, const u16_t position_y, const u32_t seq_id = DEFAULT_SEQ_ID);
     bool setZoomPosition(const u32_t position, const u32_t seq_id = DEFAULT_SEQ_ID);

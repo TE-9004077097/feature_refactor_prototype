@@ -42,6 +42,7 @@
 #include "ptzf/ptzf_initialize_infra_if.h"
 #include "infra/ptzf_infra_message.h"
 #include "ptzf/ptzf_common_message.h"
+#include "ptzf/ptzf_config_if.h"
 #include "infra/sequence_id_controller.h"
 #include "visca/visca_server_internal_mode_manager.h"
 
@@ -361,6 +362,7 @@ private:
     common::MessageQueue ptz_trace_thread_mq_;
     PtzTraceController ptz_trace_controller_;
     infra::PtzfStatusInfraIf status_infra_if_;
+    PtzfConfigIf config_if_;
     infra::PtzfPanTiltInfraIf pan_tilt_infra_if_;
     infra::PtzfZoomInfraIf zoom_infra_if_;
     infra::PtzfFocusInfraIf focus_infra_if_;

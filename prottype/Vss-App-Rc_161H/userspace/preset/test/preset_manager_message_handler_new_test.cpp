@@ -21,7 +21,6 @@
 #include "visca/visca_server_ptzf_if_mock.h"
 #include "event_router/event_router_if_mock.h"
 #include "ptzf/ptzf_status_if_mock.h"
-#include "ptzf/ptzf_config_if_mock.h"
 #include "camera_osd/camera_osd_status_if_mock.h"
 #include "op_device/op_device_status_if_mock.h"
 #include "visca/visca_status_if_mock.h"

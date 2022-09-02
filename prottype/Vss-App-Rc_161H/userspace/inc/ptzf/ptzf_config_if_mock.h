@@ -11,7 +11,6 @@
 #include "gmock/gmock.h"
 #include "visca/dboutputs/enum.h"
 #include "ptzf_parameter.h"
-#include "ptzf_enum.h"
 
 namespace ptzf {
 

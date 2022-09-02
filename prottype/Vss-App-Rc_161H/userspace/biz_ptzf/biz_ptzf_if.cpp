@@ -312,6 +312,28 @@ bool convertTouchFunctionInMf(TouchFunctionInMf value, ptzf::TouchFunctionInMf& 
     return false;
 }
 
+bool convertFocusArea(const uint8_t value, ptzf::FocusArea & focusarea_value)
+{
+    static const struct convertFocusAreaTable
+    {
+        FocusArea biz_ptzf_value;
+        ptzf::FocusArea ptzf_value;
+    } table[] = {
+        { FOCUS_AREA_WIDE, ptzf::FOCUS_AREA_WIDE },
+        { FOCUS_AREA_ZONE, ptzf::FOCUS_AREA_ZONE },
+        { FOCUS_AREA_FLEXIBLE_SPOT, ptzf::FOCUS_AREA_FLEXIBLE_SPOT },
+    };
+
+    ARRAY_FOREACH (table, i) {
+        if (table[i].biz_ptzf_value == value) {
+            ptzf_value = table[i].ptzf_value;
+            return true;
+        }
+    }
+    return false;
+
+}
+
 static const struct ConvertPTZModeTable
 {
     PTZMode biz_ptzf_value;
@@ -771,8 +793,8 @@ public:
     bool setPTZTraceDelete(const u32_t trace_id, const u32_t seq_id);
     bool setStandbyMode(const StandbyMode standby_mode, const u32_t seq_id);
     bool setName(const TraceName& name, const u32_t seq_id);
-    bool setFocusMode(const FocusMode focus_mode, const u32_t seq_id);
-    bool setFocusArea(const FocusArea focus_area, const u32_t seq_id);
+    bool setFocusMode(const uint8_t focus_mode, const u32_t seq_id);
+    bool setFocusArea(const uint8_t focus_area, const u32_t seq_id);
     bool setAFAreaPositionAFC(const u16_t position_x, const u16_t position_y, const u32_t seq_id);
     bool setAFAreaPositionAFS(const u16_t position_x, const u16_t position_y, const u32_t seq_id);
     bool setZoomPosition(const u32_t position, const u32_t seq_id);
@@ -1485,15 +1507,26 @@ bool BizPtzfIf::BizPtzfIfImpl::setName(const TraceName& name, const u32_t seq_id
     return true;
 }
 
-bool BizPtzfIf::BizPtzfIfImpl::setFocusMode(const FocusMode focus_mode, const u32_t seq_id)
+bool BizPtzfIf::BizPtzfIfImpl::setFocusMode(const uint8_t focus_mode, const u32_t seq_id)
 {
-    ptzf::FocusModeRequest request(static_cast<ptzf::FocusMode>(focus_mode), seq_id, mq_name_);
+    ptzf::FocusMode focusmode_value;
+	if(!convertFocusMode(focus_mode, focusmode_value)) {
+        return false;
+    }
+
+    ptzf::FocusModeRequest request(focusmode_value, seq_id, mq_name_);
     msg_if_.post(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER, request);
     return true;
 }
-bool BizPtzfIf::BizPtzfIfImpl::setFocusArea(const FocusArea focus_area, const u32_t seq_id)
+bool BizPtzfIf::BizPtzfIfImpl::setFocusArea(const uint8_t focus_area, const u32_t seq_id)
 {
-    ptzf::FocusAreaRequest request(static_cast<ptzf::FocusArea>(focus_area), seq_id, mq_name_);
+    ptzf::FocusArea focusarea_value;
+    if(!convertFocusArea(focus_area, focusarea_value))
+    {
+        return false;
+    }
+
+    ptzf::FocusAreaRequest request(focusarea_value, seq_id, mq_name_);
     msg_if_.post(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER, request);
     return true;
 }
@@ -2912,12 +2945,12 @@ bool BizPtzfIf::setName(const TraceName& name, const u32_t seq_id)
     return pimpl_->setName(name, seq_id);
 }
 
-bool BizPtzfIf::setFocusMode(const FocusMode focus_mode, const u32_t seq_id)
+bool BizPtzfIf::setFocusMode(const uint8_t focus_mode, const u32_t seq_id)
 {
     return pimpl_->setFocusMode(focus_mode, seq_id);
 }
 
-bool BizPtzfIf::setFocusArea(const FocusArea focus_area, const u32_t seq_id)
+bool BizPtzfIf::setFocusArea(const uint8_t focus_area, const u32_t seq_id)
 {
     return pimpl_->setFocusArea(focus_area, seq_id);
 }

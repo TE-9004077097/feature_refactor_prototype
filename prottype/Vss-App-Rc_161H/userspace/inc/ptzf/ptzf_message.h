@@ -168,7 +168,6 @@ struct AFAreaPositionAFCRequest
     u16_t positiony;
     u32_t seq_id;
     common::MessageQueueName mq_name;
-//TODO positionx, positiony default value ???
     AFAreaPositionAFCRequest() : positionx(0), positiony(0), seq_id(INVALID_SEQ_ID), mq_name()
     {}
    explicit AFAreaPositionAFCRequest(const u16_t x, const u16_t y) : positionx(x), positiony(y), seq_id(INVALID_SEQ_ID), mq_name()
@@ -187,7 +186,6 @@ struct AFAreaPositionAFSRequest
     u16_t positiony;
     u32_t seq_id;
     common::MessageQueueName mq_name;
-//TODO positionx, positiony default value ???
     AFAreaPositionAFSRequest() : positionx(0), positiony(0), seq_id(INVALID_SEQ_ID), mq_name()
     {}
    explicit AFAreaPositionAFSRequest(const u16_t x, const u16_t y) : positionx(x), positiony(y), seq_id(INVALID_SEQ_ID), mq_name()
@@ -205,7 +203,6 @@ struct ZoomPositionRequest
     u32_t pos;
     u32_t seq_id;
     common::MessageQueueName mq_name;
-//TODO position default value ???
     ZoomPositionRequest() : pos(0), seq_id(INVALID_SEQ_ID), mq_name()
     {}
    explicit ZoomPositionRequest(const u32_t position) : pos(position), seq_id(INVALID_SEQ_ID), mq_name()
@@ -222,7 +219,6 @@ struct FocusPositionRequest
     u32_t pos;
     u32_t seq_id;
     common::MessageQueueName mq_name;
-//TODO position default value ???
     FocusPositionRequest() : pos(0), seq_id(INVALID_SEQ_ID), mq_name()
     {}
    explicit FocusPositionRequest(const u32_t position) : pos(position), seq_id(INVALID_SEQ_ID), mq_name()
