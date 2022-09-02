@@ -3,7 +3,7 @@
  *
  * Copyright 2016,2018,2022 Sony Corporation.
  */
-
+        
 #include <vector>
 
 #include "types.h"
@@ -36,12 +36,10 @@
 #include "power/power_sequencer.h"
 
 namespace application {
-
 namespace {
 const common::Log::PrintFunc& pf(common::Log::instance().getPrintFunc());
 
-const std::vector<common::Task::Affinity> cpu_ids = { APPRC_CPU_AFFINITY }; // ←{} 内を削除するとコンパイルが通る
-
+const std::vector<common::Task::Affinity> cpu_ids = { APPRC_CPU_AFFINITY }; //
 
 void waitRebootRequest()
 {
