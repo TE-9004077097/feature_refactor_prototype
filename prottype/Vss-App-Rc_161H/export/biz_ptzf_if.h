@@ -48,6 +48,13 @@ enum FocusMode
     FOCUS_MODE_TOGGLE
 };
 
+enum FocusArea
+{
+    FOCUS_AREA_WIDE = 0x00,
+    FOCUS_AREA_ZONE,
+    FOCUS_AREA_FLEXIBLE_SPOT,
+};
+
 enum FocusDirection
 {
     FOCUS_DIRECTION_STOP = 0x00,
@@ -98,13 +105,6 @@ enum FocusFaceEyeDetectionMode
     FOCUS_FACE_EYE_DETECTION_MODE_FACE_EYE_ONLY = 0x00,
     FOCUS_FACE_EYE_DETECTION_MODE_FACE_EYE_PRIORITY = 0x01,
     FOCUS_FACE_EYE_DETECTION_MODE_OFF = 0x02,
-};
-
-enum FocusArea
-{
-    FOCUS_AREA_WIDE = 0x00,
-    FOCUS_AREA_ZONE,
-    FOCUS_AREA_FLEXIBLE_SPOT,
 };
 
 enum TouchFunctionInMf
@@ -417,6 +417,8 @@ public:
     bool setFocusAFMode(const AFMode mode, const u32_t seq_id = DEFAULT_SEQ_ID);
     bool setFocusFaceEyedetection(const FocusFaceEyeDetectionMode focus_face_eye_detection_mode,
                                   const u32_t seq_id = DEFAULT_SEQ_ID);
+    bool setFocusFaceEyedetectionValue(const FocusFaceEyeDetectionMode focus_face_eye_detection_mode,
+                                  const u32_t seq_id = DEFAULT_SEQ_ID);
     bool setAfAssist(const bool on_off, const u32_t seq_id = DEFAULT_SEQ_ID);
     bool setFocusTrackingPosition(const u16_t pos_x, const u16_t pos_y, const u32_t seq_id = DEFAULT_SEQ_ID);
     bool setTouchFunctionInMf(const TouchFunctionInMf touch_function_in_mf, const u32_t seq_id = DEFAULT_SEQ_ID);
@@ -450,14 +452,16 @@ public:
     bool setPTZTraceDelete(const u32_t trace_id, const u32_t seq_id = DEFAULT_SEQ_ID);
     bool setStandbyMode(const StandbyMode standby_mode, const u32_t seq_id = DEFAULT_SEQ_ID);
     bool setName(const TraceName& name, const u32_t seq_id = DEFAULT_SEQ_ID);
-    bool setFocusMode(const uint8_t focus_mode, const u32_t seq_id = DEFAULT_SEQ_ID);
-    bool setFocusArea(const uint8_t focus_area, const u32_t seq_id = DEFAULT_SEQ_ID);
+    bool setFocusMode(const FocusMode focus_mode, const u32_t seq_id = DEFAULT_SEQ_ID);
+    bool setFocusArea(const FocusArea focus_area, const u32_t seq_id = DEFAULT_SEQ_ID);
     bool setAFAreaPositionAFC(const u16_t position_x, const u16_t position_y, const u32_t seq_id = DEFAULT_SEQ_ID);
     bool setAFAreaPositionAFS(const u16_t position_x, const u16_t position_y, const u32_t seq_id = DEFAULT_SEQ_ID);
     bool setZoomPosition(const u32_t position, const u32_t seq_id = DEFAULT_SEQ_ID);
     bool setFocusPosition(const u32_t position, const u32_t seq_id = DEFAULT_SEQ_ID);
     bool setAfSubjShiftSens(const uint8_t& af_subj_shift_sens, const u32_t seq_id = DEFAULT_SEQ_ID);
     bool setAfTransitionSpeed(const uint8_t& af_transition_speed, const u32_t seq_id = DEFAULT_SEQ_ID);
+    bool setAfTransitionSpeedValue(const uint8_t& af_transition_speed, const u32_t seq_id = DEFAULT_SEQ_ID);
+    bool setAfSubjShiftSensValue(const uint8_t& af_subj_shift_sens, const u32_t seq_id = DEFAULT_SEQ_ID);
     bool noticeCreateTraceThumbnailComp(const std::string file_path,
                                         const u32_t trace_id,
                                         const u32_t seq_id = DEFAULT_SEQ_ID);

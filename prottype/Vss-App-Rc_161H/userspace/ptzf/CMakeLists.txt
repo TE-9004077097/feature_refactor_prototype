@@ -25,10 +25,11 @@ cxx_gmock_executable(power_status_event_listener_ptzf_on_boot_test
   "${power_status_event_listener_ptzf_on_boot_test_libs}"
   test/power_status_event_listener_ptzf_on_boot_test.cpp)
 add_library_tests(ptzf_controller_entry power_status_event_listener_ptzf_on_boot_test)
+
 list(APPEND ptzf_controller_message_handler_libs ptzf_status)
-list(APPEND ptzf_controller_message_handler_libs ptzf_config)
 list(APPEND ptzf_controller_message_handler_libs error_notifier_message_if)
 list(APPEND ptzf_controller_message_handler_libs ptzf_status_if)
+list(APPEND ptzf_controller_message_handler_libs ptzf_config_if)
 list(APPEND ptzf_controller_message_handler_libs pt_micon_power_infra_if)
 list(APPEND ptzf_controller_message_handler_libs event_router_receiver)
 list(APPEND ptzf_controller_message_handler_libs ptzf_controller)
@@ -116,7 +117,6 @@ cxx_gmock_executable(ptzf_controller_message_handler_test
 add_library_tests(ptzf_controller_message_handler ptzf_controller_message_handler_test)
 
 list(APPEND ptzf_controller_initializer_libs ptzf_status)
-list(APPEND ptzf_controller_initializer_libs ptzf_config)
 list(APPEND ptzf_controller_initializer_libs error_notifier_message_if)
 list(APPEND ptzf_controller_initializer_libs pan_tilt_limit_position)
 list(APPEND ptzf_controller_initializer_libs video_status_if)
@@ -127,6 +127,7 @@ if(NOT CMAKE_CROSSCOMPILING)
   list(APPEND ptzf_controller_initializer_libs metadata_control_if_mock)
 else(NOT CMAKE_CROSSCOMPILING)
   list(APPEND ptzf_controller_initializer_libs ptzf_status_if)
+  list(APPEND ptzf_controller_initializer_libs ptzf_config_if)
   list(APPEND ptzf_controller_initializer_libs metadata_control_if)
   list(APPEND ptzf_controller_initializer_libs ptzf_initializer_infra_if)
 endif(NOT CMAKE_CROSSCOMPILING)
@@ -164,7 +165,6 @@ list(APPEND ptzf_controller_finalizer_test_libs ptzf_finalizer_infra_if_mock)
 list(APPEND ptzf_controller_finalizer_test_libs ptzf_backup_infra_if_mock)
 list(APPEND ptzf_controller_finalizer_test_libs ptzf_status_if_mock)
 list(APPEND ptzf_controller_finalizer_test_libs ptzf_config_if_mock)
-
 list(APPEND ptzf_controller_finalizer_test_libs visca_server_message_if_mock)
 cxx_gmock_executable(ptzf_controller_finalizer_test
   "ptzf_controller_finalizer;${ptzf_controller_finalizer_test_libs}"
@@ -185,14 +185,23 @@ add_library_tests(ptzf_message_if ptzf_message_if_test)
 cxx_static_library(ptzf_status_if
   "visca_config_core;ptzf_status_infra_if;pan_tilt_value_manager;ptzf_capability_infra_if;ptzf_backup_infra_if"
   ptzf_status_if.cpp)
-#cxx_static_library(ptzf_config_if
-#  "visca_config_core;ptzf_status_infra_if;ptzf_config_infra_if;pan_tilt_value_manager;ptzf_capability_infra_if;ptzf_backup_infra_if"
-#  ptzf_config_if.cpp)
+
+list(APPEND ptzf_config_if_libs visca_config_core)
+list(APPEND ptzf_config_if_libs ptzf_config_infra_if)
+list(APPEND ptzf_config_if_libs pan_tilt_value_manager)
+list(APPEND ptzf_config_if_libs ptzf_capability_infra_if)
+list(APPEND ptzf_config_if_libs ptzf_backup_infra_if)
+cxx_static_library(ptzf_config_if
+  "${ptzf_config_if_libs}"
+  ptzf_config_if.cpp)
+
 cxx_static_library(ptzf_status_if_mock
   "common_core"
   ptzf_status_if_mock.cpp)
-  cxx_static_library(ptzf_config_if_mock
-  "common_core"
+
+list(APPEND ptzf_config_if_mock_libs common_core)
+cxx_static_library(ptzf_config_if_mock
+  "${ptzf_config_if_mock_libs}"
   ptzf_config_if_mock.cpp)
 
 list(APPEND ptzf_biz_message_if_libs visca_config_core)
@@ -256,7 +265,7 @@ cxx_static_library(pan_tilt_limit_controller
 
 if(CMAKE_CROSSCOMPILING)
   cxx_executable_no_install(ptzf_controller_message_if_target_test
-    "ptzf_message_if;ptzf_status;ptzf_config;ptzf_status_if;ptzf_pan_tilt_infra_if;error_notifier_message_if;common_core;common_main;biz_ptzf_if"
+    "ptzf_message_if;ptzf_status;ptzf_status_if;ptzf_pan_tilt_infra_if;error_notifier_message_if;common_core;common_main;biz_ptzf_if"
     test/ptzf_controller_message_if_target_test.cpp)
   cxx_executable_no_install(set_standby_mode_target_test
     "common_core;common_main;event_router_if;ptzf_message_if;ptzf_status_if"
@@ -283,36 +292,22 @@ endif (G8_BUILD)
 cxx_static_library(ptzf_status
   "${ptzf_status_libs}"
   ptzf_status.cpp)
-  cxx_static_library(ptzf_config
-  "${ptzf_status_libs}"
-  ptzf_status.cpp)
 
 if(CMAKE_CROSSCOMPILING)
-cxx_gmock_executable(ptzf_status_test
-"ptzf_status;error_notifier_message_if_mock;ptzf_capability_infra_if;ptzf_status_if;visca_config_core;common_core;ptzf_backup_infra_if_mock"
-test/ptzf_status_test.cpp)
-  #cxx_gmock_executable(ptzf_config_test
-  #  "ptzf_status;ptzf_config;error_notifier_message_if_mock;ptzf_capability_infra_if;ptzf_status_if;ptzf_config_if;visca_config_core;common_core;ptzf_backup_infra_if_mock"
-  #  test/ptzf_status_test.cpp)
+  cxx_gmock_executable(ptzf_status_test
+    "ptzf_status;error_notifier_message_if_mock;ptzf_capability_infra_if;ptzf_status_if;visca_config_core;common_core;ptzf_backup_infra_if_mock"
+    test/ptzf_status_test.cpp)
 else(CMAKE_CROSSCOMPILING)
   if(APPRC_CAMERA_PROTOCOL_VISCA)
     cxx_gmock_executable(ptzf_status_test
       "ptzf_status;error_notifier_message_if_mock;ptzf_capability_infra_if_g8;ptzf_status_if_g8;ptzf_config_if_g8;visca_config_core;common_core;ptzf_backup_infra_if_mock"
       test/ptzf_status_test.cpp)
-    #cxx_gmock_executable(ptzf_config_test
-    #  "ptzf_status;ptzf_config;error_notifier_message_if_mock;ptzf_capability_infra_if_g8;ptzf_status_if_g8;ptzf_config_if_g8;visca_config_core;common_core;ptzf_backup_infra_if_mock"
-    #  test/ptzf_status_test.cpp)
   else(APPRC_CAMERA_PROTOCOL_VISCA)
     cxx_gmock_executable(ptzf_status_test
       "ptzf_status;error_notifier_message_if_mock;ptzf_capability_infra_if_marco;ptzf_status_if_marco;visca_config_core;common_core;ptzf_backup_infra_if_mock"
       test/ptzf_status_test.cpp)
-    #  cxx_gmock_executable(ptzf_config_test
-    #  "ptzf_status;ptzf_config;error_notifier_message_if_mock;ptzf_capability_infra_if_marco;ptzf_status_if_marco;ptzf_config_if_marco;visca_config_core;common_core;ptzf_backup_infra_if_mock"
-    #  test/ptzf_status_test.cpp)
   endif(APPRC_CAMERA_PROTOCOL_VISCA)
 endif(CMAKE_CROSSCOMPILING)
-#add_library_tests(ptzf_status ptzf_status_test)
-#add_library_tests(ptzf_config ptzf_config_test)
 
 cxx_gmock_executable(pan_tilt_limit_position_test
   "pan_tilt_limit_position;ptzf_status_if_mock;ptzf_config_if_mock;image_flip_notifier"
@@ -374,7 +369,6 @@ list(APPEND ptzf_controller_test_libs video_status_if_mock)
 list(APPEND ptzf_controller_test_libs menu_status_mock)
 list(APPEND ptzf_controller_test_libs ptz_trace_status_if_mock)
 list(APPEND ptzf_controller_test_libs camera_osd_status_if_mock)
-list(APPEND ptzf_controller_test_libs ptzf_controller_message_handler)
 cxx_gmock_executable(ptzf_controller_test
   "${ptzf_controller_test_libs}"
   test/ptzf_controller_test.cpp
@@ -389,7 +383,6 @@ cxx_static_library(ptzf_controller_mock "common_core" ptzf_controller_mock.cpp)
 
 list(APPEND pan_tilt_limit_controller_test_libs pan_tilt_limit_controller)
 list(APPEND pan_tilt_limit_controller_test_libs ptzf_status)
-list(APPEND pan_tilt_limit_controller_test_libs ptzf_config)
 list(APPEND pan_tilt_limit_controller_test_libs error_notifier_message_if_mock)
 list(APPEND pan_tilt_limit_controller_test_libs ptzf_status_if)
 list(APPEND pan_tilt_limit_controller_test_libs ptzf_pan_tilt_infra_if_mock)
@@ -458,7 +451,6 @@ cxx_static_library(ptz_trace_controller_thread
 
 list(APPEND ptz_trace_controller_worker_thread_libs ptz_trace_data_manager)
 list(APPEND ptz_trace_controller_worker_thread_libs ptzf_status)
-list(APPEND ptz_trace_controller_worker_thread_libs ptzf_config)
 list(APPEND ptz_trace_controller_worker_thread_libs error_notifier_message_if)
 list(APPEND ptz_trace_controller_worker_thread_libs ptz_trace_status)
 list(APPEND ptz_trace_controller_worker_thread_libs ptz_trace_status_if)
@@ -680,15 +672,28 @@ if(NOT CMAKE_CROSSCOMPILING)
       cxx_static_library(ptzf_status_if_g8
         "visca_config_core;ptzf_status_infra_if;ptzf_config_infra_if;pan_tilt_value_manager;ptzf_capability_infra_if_g8;ptzf_backup_infra_if"
         ptzf_status_if.cpp)
+
+      list(APPEND ptzf_config_if_g8_libs visca_config_core)
+      list(APPEND ptzf_config_if_g8_libs pan_tilt_value_manager)
+      list(APPEND ptzf_config_if_g8_libs ptzf_capability_infra_if_g8)
+      list(APPEND ptzf_config_if_g8_libs ptzf_backup_infra_if)
       cxx_static_library(ptzf_config_if_g8
-        "visca_config_core;pan_tilt_value_manager;ptzf_capability_infra_if_g8;ptzf_backup_infra_if"
+        "${ptzf_config_if_g8_libs}"
         ptzf_config_if.cpp)
+
     else(APPRC_CAMERA_PROTOCOL_VISCA)
       cxx_static_library(ptzf_status_if_marco
         "visca_config_core;ptzf_status_infra_if;ptzf_config_infra_if;pan_tilt_value_manager;ptzf_capability_infra_if_marco;ptzf_backup_infra_if"
         ptzf_status_if.cpp)
+
+      list(APPEND ptzf_config_if_marco_libs visca_config_core)
+      list(APPEND ptzf_config_if_marco_libs ptzf_status_infra_if)
+      list(APPEND ptzf_config_if_marco_libs ptzf_config_infra_if)
+      list(APPEND ptzf_config_if_marco_libs pan_tilt_value_manager)
+      list(APPEND ptzf_config_if_marco_libs ptzf_capability_infra_if_marco)
+      list(APPEND ptzf_config_if_marco_libs ptzf_backup_infra_if)
       cxx_static_library(ptzf_config_if_marco
-        "visca_config_core;ptzf_status_infra_if;ptzf_config_infra_if;pan_tilt_value_manager;ptzf_capability_infra_if_marco;ptzf_backup_infra_if"
+        "${ptzf_config_if_marco_libs}"
         ptzf_config_if.cpp)
     endif(APPRC_CAMERA_PROTOCOL_VISCA)
   endif(G8_BUILD)

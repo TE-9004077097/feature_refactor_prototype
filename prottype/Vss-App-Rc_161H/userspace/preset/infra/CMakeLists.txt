@@ -137,7 +137,8 @@ elseif(G8_BUILD)
     list(APPEND preset_database_backup_infra_if_test_dependencies visca_config_fake)
     list(APPEND preset_database_backup_infra_if_test_dependencies visca_config_database_manager_mock)
     list(APPEND preset_database_backup_infra_if_test_dependencies ptp_driver_command_if)
-    list(APPEND preset_database_backup_infra_if_test_dependencies biz_ptzf_if)
+    list(APPEND preset_database_backup_infra_if_test_dependencies biz_ptzf_if_mock)
+    list(APPEND preset_database_backup_infra_if_test_dependencies ptzf_config_if_mock)
     cxx_gmock_executable(preset_database_backup_infra_if_test "${preset_database_backup_infra_if_test_dependencies}"
       test/preset_database_backup_infra_if_marco_test.cpp
       preset_database_backup_infra_message_handler_marco_fake.cpp
@@ -147,6 +148,7 @@ elseif(G8_BUILD)
     list(APPEND preset_database_backup_infra_message_handler_dependencies common_core)
     list(APPEND preset_database_backup_infra_message_handler_dependencies ptp_error_checker)
     list(APPEND preset_database_backup_infra_message_handler_dependencies ptp_driver_command_if)
+    list(APPEND preset_database_backup_infra_message_handler_dependencies biz_ptzf_if)
     cxx_static_library(preset_database_backup_infra_message_handler
       "${preset_database_backup_infra_message_handler_dependencies}"
       preset_database_backup_infra_message_handler_marco.cpp
@@ -155,7 +157,7 @@ elseif(G8_BUILD)
     list(APPEND preset_database_backup_infra_message_handler_test_dependencies common_core)
     list(APPEND preset_database_backup_infra_message_handler_test_dependencies ptp_error_checker)
     list(APPEND preset_database_backup_infra_message_handler_test_dependencies visca_server_message_if_mock)
-    list(APPEND preset_database_backup_infra_message_handler_test_dependencies biz_ptzf_if)
+    list(APPEND preset_database_backup_infra_message_handler_test_dependencies biz_ptzf_if_mock)
     cxx_gmock_executable(preset_database_backup_infra_message_handler_test
       "${preset_database_backup_infra_message_handler_test_dependencies}"
       test/preset_database_backup_infra_message_handler_marco_test.cpp
@@ -195,7 +197,8 @@ elseif(G8_BUILD)
     list(APPEND preset_infra_message_handler_test_dependencies common_core)
     list(APPEND preset_infra_message_handler_test_dependencies ptp_error_checker)
     list(APPEND preset_infra_message_handler_test_dependencies visca_server_message_if_mock)
-    list(APPEND preset_infra_message_handler_test_dependencies biz_ptzf_if)
+    list(APPEND preset_infra_message_handler_test_dependencies ptzf_status_if_mock)
+    list(APPEND preset_infra_message_handler_test_dependencies biz_ptzf_if_mock)
     cxx_gmock_executable(preset_infra_message_handler_test
       "${preset_infra_message_handler_test_dependencies}"
       test/preset_infra_message_handler_marco_test.cpp

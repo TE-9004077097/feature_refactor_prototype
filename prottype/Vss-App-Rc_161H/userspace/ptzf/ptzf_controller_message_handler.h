@@ -126,8 +126,9 @@ private:
     void doHandleRequest(const PanTiltMoveRequest& msg);
     void doHandleRequest(const ZoomMoveRequest& msg);
     void doHandleRequest(const FocusModeRequest& msg);
-    void doHandleRequest(const SetAfTransitionSpeedRequest& msg);
-    void doHandleRequest(const SetAfSubjShiftSensRequest& msg);
+    void doHandleRequest(const FocusModeValueRequest& msg);
+    void doHandleRequest(const SetAfTransitionSpeedValueRequest& msg);
+    void doHandleRequest(const SetAfSubjShiftSensValueRequest& msg);
     void doHandleRequest(const FocusAreaRequest& msg);
     void doHandleRequest(const AFAreaPositionAFCRequest& msg);
     void doHandleRequest(const AFAreaPositionAFSRequest& msg);
@@ -268,6 +269,7 @@ private:
     void doHandleRequest(const SetFocusNearLimitRequest& msg);
     void doHandleRequest(const SetFocusAFModeRequest& msg);
     void doHandleRequest(const SetFocusFaceEyeDetectionModeRequest& msg);
+    void doHandleRequest(const SetFocusFaceEyeDetectionValueModeRequest& msg);
     void doHandleRequest(const SetAfAssistRequest& msg);
     void doHandleRequest(const SetFocusTrackingPositionRequest& msg);
     void doHandleRequest(const SetTouchFunctionInMfRequest& msg);

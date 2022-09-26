@@ -459,19 +459,9 @@ bool PtzfStatusInfraIf::getFocusMode(const u32_t, FocusMode& focus_mode)
     return true;
 }
 
-bool PtzfStatusInfraIf::setFocusMode(const FocusMode)
-{
-    return true;
-}
-
 bool PtzfStatusInfraIf::getAfTransitionSpeed(const u32_t, u8_t& af_transition_speed)
 {
     af_transition_speed = PtzfStatusInfraIf::Impl::af_transition_speed_;
-    return true;
-}
-
-bool PtzfStatusInfraIf::setAfTransitionSpeed(const u8_t)
-{
     return true;
 }
 
@@ -481,30 +471,15 @@ bool PtzfStatusInfraIf::getAfSubjShiftSens(const u32_t, u8_t& af_subj_shift_sens
     return true;
 }
 
-bool PtzfStatusInfraIf::setAfSubjShiftSens(const u8_t)
-{
-    return true;
-}
-
 bool PtzfStatusInfraIf::getFocusFaceEyedetection(const u32_t, FocusFaceEyeDetectionMode& detection_mode)
 {
     detection_mode = PtzfStatusInfraIf::Impl::detection_mode_;
     return true;
 }
 
-bool PtzfStatusInfraIf::setFocusFaceEyedetection(const FocusFaceEyeDetectionMode)
-{
-    return true;
-}
-
 bool PtzfStatusInfraIf::getFocusArea(const u32_t, FocusArea& focus_area)
 {
     focus_area = PtzfStatusInfraIf::Impl::focus_area_;
-    return true;
-}
-
-bool PtzfStatusInfraIf::setFocusArea(const FocusArea)
-{
     return true;
 }
 
@@ -515,20 +490,10 @@ bool PtzfStatusInfraIf::getAFAreaPositionAFC(const u32_t, u16_t& position_x, u16
     return true;
 }
 
-bool PtzfStatusInfraIf::setAFAreaPositionAFC(const u16_t, const u16_t)
-{
-    return true;
-}
-
 bool PtzfStatusInfraIf::getAFAreaPositionAFS(const u32_t, u16_t& position_x, u16_t& position_y)
 {
     position_x = PtzfStatusInfraIf::Impl::af_area_position_x_;
     position_y = PtzfStatusInfraIf::Impl::af_area_position_y_;
-    return true;
-}
-
-bool PtzfStatusInfraIf::setAFAreaPositionAFS(const u16_t, const u16_t)
-{
     return true;
 }
 
@@ -538,19 +503,9 @@ bool PtzfStatusInfraIf::getZoomPosition(const u32_t, u32_t& position)
     return true;
 }
 
-bool PtzfStatusInfraIf::setZoomPosition(const u32_t)
-{
-    return true;
-}
-
 bool PtzfStatusInfraIf::getFocusPosition(const u32_t, u32_t& position)
 {
     position = PtzfStatusInfraIf::Impl::focus_position_;
-    return true;
-}
-
-bool PtzfStatusInfraIf::setFocusPosition(const u32_t)
-{
     return true;
 }
 
@@ -617,11 +572,6 @@ bool PtzfStatusInfraIf::setPanTiltUnlockErrorStatus(const bool& status)
 bool PtzfStatusInfraIf::isClearImageZoomOn()
 {
     return true;
-}
-
-void PtzfStatusInfraIf::setPtMiconPowerOnCompStatus(const bool is_complete)
-{
-    PtzfStatusInfraIf::Impl::pt_micon_power_on_complete_ = is_complete;
 }
 
 void PtzfStatusInfraIf::getPtMiconPowerOnCompStatus(bool& is_complete)

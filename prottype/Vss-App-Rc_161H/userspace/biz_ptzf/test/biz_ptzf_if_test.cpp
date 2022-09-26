@@ -96,6 +96,15 @@ using ::testing::Invoke;
 // + setPushAFMode()
 // + exeCancelZoomPosition
 // + exeCancelFocusPosition
+// + setFocusMode
+// + setAfTransitionSpeedValue
+// + setAfSubjShiftSensValue
+// + setFocusFaceEyedetectionValue
+// + setFocusArea
+// + setAFAreaPositionAFC
+// + setAFAreaPositionAFS
+// + setZoomPosition
+// + setFocusPosition
 //    上記メソッドそれぞれについて、以下の観点を確認
 //    + PtzControllerMessageHandler向けに送信しているメッセージが正しいこと(1Way/2Wayそれぞれ)
 //    + enum未定義の設定値である場合、PtzControllerMessageHandler向けにメッセージを送信しないこと(1Way/2Wayそれぞれ)
@@ -213,8 +222,13 @@ namespace {
 const DZoom zoom_mode_values[] = { DZOOM_FULL, DZOOM_OPTICAL, DZOOM_CLEAR_IMAGE };
 const AFMode focus_af_mode_values[] = { AUTO_FOCUS_NORMAL, AUTO_FOCUS_INTERVAL, AUTO_FOCUS_ZOOM_TRIGGER };
 const AFSensitivityMode af_sensitivity_value[] = { AF_SENSITIVITY_MODE_NORMAL, AF_SENSITIVITY_MODE_LOW };
-const int8_t af_subj_shift_sens_values[] = { 0x01, 0x02, 0x03, 0x04, 0x05 };
-const int8_t af_transition_speed_values[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
+const uint8_t af_subj_shift_sens_values[] = { 0x01, 0x02, 0x03, 0x04, 0x05 };
+const uint8_t af_transition_speed_values[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
+const FocusMode focus_mode_values[] = { FOCUS_MODE_AUTO, FOCUS_MODE_MANUAL, FOCUS_MODE_TOGGLE };
+const FocusArea focus_area_values[] = { FOCUS_AREA_WIDE, FOCUS_AREA_ZONE, FOCUS_AREA_FLEXIBLE_SPOT };
+const u16_t u16_t_case_list[] = { U32_T(0), U32_T(1), U32_T(10), U32_T(65534), U32_T(65535) };
+const u32_t u32_t_case_list[] = { U32_T(0), U32_T(1), U32_T(10), U32_T(4294967294), U32_T(4294967295) };
+
 } // namespace
 
 class BizPtzfIfTest : public ::testing::Test
@@ -819,6 +833,114 @@ MATCHER_P3(EqSetFocusFaceEyeDetectionModeRequest, focus_face_eye_detection_mode,
     std::string mq_name_str = mq_name.name;
     if (req->focus_face_eye_detection_mode == focus_face_eye_detection_mode && req->seq_id == seq_id
         && gtl::isStringEqual(req->reply_name.name, mq_name_str)) {
+        return true;
+    }
+    return false;
+}
+
+MATCHER_P3(EqSetFocusModeRequest, mode, seq_id, mq_name, "")
+{
+    const ptzf::FocusModeValueRequest* req =
+        reinterpret_cast<const ptzf::FocusModeValueRequest*>(arg);
+    std::string mq_name_str = mq_name.name;
+    if (req->mode == mode && req->seq_id == seq_id
+        && gtl::isStringEqual(req->mq_name.name, mq_name_str)) {
+        return true;
+    }
+    return false;
+}
+
+MATCHER_P3(EqSetAfTransitionSpeedValueRequest, af_transition_speed, seq_id, mq_name, "")
+{
+    const ptzf::SetAfTransitionSpeedValueRequest* req =
+        reinterpret_cast<const ptzf::SetAfTransitionSpeedValueRequest*>(arg);
+    std::string mq_name_str = mq_name.name;
+    if (req->af_transition_speed == af_transition_speed && req->seq_id == seq_id
+        && gtl::isStringEqual(req->mq_name.name, mq_name_str)) {
+        return true;
+    }
+    return false;
+}
+
+MATCHER_P3(EqSetAfSubjShiftSensValueRequest, af_subj_shift_sens, seq_id, mq_name, "")
+{
+    const ptzf::SetAfSubjShiftSensValueRequest* req =
+        reinterpret_cast<const ptzf::SetAfSubjShiftSensValueRequest*>(arg);
+    std::string mq_name_str = mq_name.name;
+    if (req->af_subj_shift_sens == af_subj_shift_sens && req->seq_id == seq_id
+        && gtl::isStringEqual(req->mq_name.name, mq_name_str)) {
+        return true;
+    }
+    return false;
+}
+
+MATCHER_P3(EqSetFocusFaceEyeDetectionValueModeRequest, focus_face_eye_detection_mode, seq_id, mq_name, "")
+{
+    const ptzf::SetFocusFaceEyeDetectionValueModeRequest* req =
+        reinterpret_cast<const ptzf::SetFocusFaceEyeDetectionValueModeRequest*>(arg);
+    std::string mq_name_str = mq_name.name;
+    if (req->focus_face_eye_detection_mode == focus_face_eye_detection_mode && req->seq_id == seq_id
+        && gtl::isStringEqual(req->reply_name.name, mq_name_str)) {
+        return true;
+    }
+    return false;
+}
+
+MATCHER_P3(EqSetFocusAreaRequest, focusarea, seq_id, mq_name, "")
+{
+    const ptzf::FocusAreaRequest* req =
+        reinterpret_cast<const ptzf::FocusAreaRequest*>(arg);
+    std::string mq_name_str = mq_name.name;
+    if (req->focusarea == focusarea && req->seq_id == seq_id
+        && gtl::isStringEqual(req->mq_name.name, mq_name_str)) {
+        return true;
+    }
+    return false;
+}
+
+MATCHER_P4(EqSetAFAreaPositionAFCRequest, position_x, position_y, seq_id, mq_name, "")
+{
+    const ptzf::AFAreaPositionAFCRequest* req =
+        reinterpret_cast<const ptzf::AFAreaPositionAFCRequest*>(arg);
+    std::string mq_name_str = mq_name.name;
+    if (req->positionx == position_x && req->positiony == position_y && req->seq_id == seq_id
+        && gtl::isStringEqual(req->mq_name.name, mq_name_str)) {
+        return true;
+    }
+    return false;
+}
+
+MATCHER_P4(EqSetAFAreaPositionAFSRequest, position_x, position_y, seq_id, mq_name, "")
+{
+    const ptzf::AFAreaPositionAFSRequest* req =
+        reinterpret_cast<const ptzf::AFAreaPositionAFSRequest*>(arg);
+    std::string mq_name_str = mq_name.name;
+    if (req->positionx == position_x && req->positiony == position_y && req->seq_id == seq_id
+        && gtl::isStringEqual(req->mq_name.name, mq_name_str)) {
+        return true;
+    }
+    return false;
+}
+
+MATCHER_P3(EqSetZoomPositionRequest, position, seq_id, mq_name, "")
+{
+    const ptzf::ZoomPositionRequest* req =
+        reinterpret_cast<const ptzf::ZoomPositionRequest*>(arg);
+    std::string mq_name_str = mq_name.name;
+    if (req->pos == position && req->seq_id == seq_id
+        && gtl::isStringEqual(req->mq_name.name, mq_name_str)) {
+        return true;
+    }
+    return false;
+}
+
+MATCHER_P3(EqSetFocusPositionRequest, position, seq_id, mq_name, "")
+{
+    const ptzf::FocusPositionRequest* req =
+        reinterpret_cast<const ptzf::FocusPositionRequest*>(arg);
+    std::string mq_name_str = mq_name.name;
+    if (req->pos == position && req->seq_id == seq_id
+        && gtl::isStringEqual(req->mq_name.name, mq_name_str)) {
         return true;
     }
     return false;
@@ -5422,6 +5544,316 @@ TEST_F(BizPtzfIfTest, getPanTiltEnabledStateError)
     const ErrorCode result = biz_ptzf_if.getPanTiltEnabledState(enabled_state);
 
     EXPECT_EQ(result, ERRORCODE_EXEC);
+}
+
+TEST_F(BizPtzfIfTest, setFocusMode1Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+
+    ARRAY_FOREACH (focus_mode_values, i) {
+        result = biz_ptzf_if.setFocusMode(focus_mode_values[i]);
+        EXPECT_TRUE(result);
+    }
+
+    result =
+        biz_ptzf_if.setFocusMode(focus_mode_values[0], INVALID_SEQ_ID);
+    EXPECT_FALSE(result);
+}
+
+TEST_F(BizPtzfIfTest, setFocusMode2Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    u32_t seq_id = U32_T(123456);
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+
+    ARRAY_FOREACH (focus_mode_values, i) {
+        result =
+            biz_ptzf_if.setFocusMode(focus_mode_values[i], seq_id);
+        EXPECT_TRUE(result);
+    }
+}
+
+TEST_F(BizPtzfIfTest, setAfTransitionSpeedValue1Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+    ARRAY_FOREACH (af_transition_speed_values, i) {
+        result = biz_ptzf_if.setAfTransitionSpeedValue(af_transition_speed_values[i]);
+        EXPECT_TRUE(result);
+    }
+    result =
+        biz_ptzf_if.setAfTransitionSpeedValue(af_transition_speed_values[0], INVALID_SEQ_ID);
+    EXPECT_FALSE(result);
+}
+
+TEST_F(BizPtzfIfTest, setAfTransitionSpeedValue2Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    u32_t seq_id = U32_T(123456);
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+
+    ARRAY_FOREACH (af_transition_speed_values, i) {
+        result =
+            biz_ptzf_if.setAfTransitionSpeedValue(af_transition_speed_values[i], seq_id);
+        EXPECT_TRUE(result);
+    }
+}
+
+TEST_F(BizPtzfIfTest, setAfSubjShiftSensValue1Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+    ARRAY_FOREACH (af_subj_shift_sens_values, i) {
+        result = biz_ptzf_if.setAfSubjShiftSensValue(af_subj_shift_sens_values[i]);
+        EXPECT_TRUE(result);
+    }
+    result =
+        biz_ptzf_if.setAfSubjShiftSensValue(af_subj_shift_sens_values[0], INVALID_SEQ_ID);
+    EXPECT_FALSE(result);
+}
+
+TEST_F(BizPtzfIfTest, setAfSubjShiftSensValue2Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    u32_t seq_id = U32_T(123456);
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+
+    ARRAY_FOREACH (af_subj_shift_sens_values, i) {
+        result =
+            biz_ptzf_if.setAfSubjShiftSensValue(af_subj_shift_sens_values[i], seq_id);
+        EXPECT_TRUE(result);
+    }
+}
+
+TEST_F(BizPtzfIfTest, setFocusFaceEyedetectionValue1Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+
+    ARRAY_FOREACH (focus_face_eye_detection_mode_test_value_table, i) {
+        result = biz_ptzf_if.setFocusFaceEyedetectionValue(focus_face_eye_detection_mode_test_value_table[i].in_mode);
+        EXPECT_TRUE(result);
+    }
+    result =
+        biz_ptzf_if.setFocusFaceEyedetectionValue(focus_face_eye_detection_mode_test_value_table[0].in_mode, INVALID_SEQ_ID);
+    EXPECT_FALSE(result);
+}
+
+TEST_F(BizPtzfIfTest, setFocusFaceEyedetectionValue2Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    u32_t seq_id = U32_T(123456);
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+
+    ARRAY_FOREACH (focus_face_eye_detection_mode_test_value_table, i) {
+        result =
+            biz_ptzf_if.setFocusFaceEyedetectionValue(focus_face_eye_detection_mode_test_value_table[i].in_mode, seq_id);
+        EXPECT_TRUE(result);
+    }
+}
+
+TEST_F(BizPtzfIfTest, setFocusArea1Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+
+    ARRAY_FOREACH (focus_area_values, i) {
+        result = biz_ptzf_if.setFocusArea(focus_area_values[i]);
+        EXPECT_TRUE(result);
+    }
+    result =
+        biz_ptzf_if.setFocusArea(focus_area_values[0], INVALID_SEQ_ID);
+    EXPECT_FALSE(result);
+}
+
+TEST_F(BizPtzfIfTest, setFocusArea2Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    u32_t seq_id = U32_T(123456);
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+
+    ARRAY_FOREACH (focus_area_values, i) {
+        result =
+            biz_ptzf_if.setFocusArea(focus_area_values[i], seq_id);
+        EXPECT_TRUE(result);
+    }
+}
+
+TEST_F(BizPtzfIfTest, setAFAreaPositionAFC1Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+    ARRAY_FOREACH (u16_t_case_list, i) {
+        result = biz_ptzf_if.setAFAreaPositionAFC(u16_t_case_list[i], u16_t_case_list[i]);
+        EXPECT_TRUE(result);
+    }
+    result =
+        biz_ptzf_if.setAFAreaPositionAFC(u16_t_case_list[0], u16_t_case_list[0], INVALID_SEQ_ID);
+    EXPECT_FALSE(result);
+}
+
+TEST_F(BizPtzfIfTest, setAFAreaPositionAFC2Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    u32_t seq_id = U32_T(123456);
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+
+    ARRAY_FOREACH (u16_t_case_list, i) {
+        result =
+            biz_ptzf_if.setAFAreaPositionAFC(u16_t_case_list[i], u16_t_case_list[i], seq_id);
+        EXPECT_TRUE(result);
+    }
+}
+
+TEST_F(BizPtzfIfTest, setAFAreaPositionAFS1Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+    ARRAY_FOREACH (u16_t_case_list, i) {
+        result = biz_ptzf_if.setAFAreaPositionAFS(u16_t_case_list[i], u16_t_case_list[i]);
+        EXPECT_TRUE(result);
+    }
+    result =
+        biz_ptzf_if.setAFAreaPositionAFS(u16_t_case_list[0], u16_t_case_list[0], INVALID_SEQ_ID);
+    EXPECT_FALSE(result);
+}
+
+TEST_F(BizPtzfIfTest, setAFAreaPositionAFS2Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    u32_t seq_id = U32_T(123456);
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+
+    ARRAY_FOREACH (u16_t_case_list, i) {
+        result =
+            biz_ptzf_if.setAFAreaPositionAFS(u16_t_case_list[i], u16_t_case_list[i], seq_id);
+        EXPECT_TRUE(result);
+    }
+}
+
+TEST_F(BizPtzfIfTest, setZoomPosition1Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+    ARRAY_FOREACH (u32_t_case_list, i) {
+        result = biz_ptzf_if.setZoomPosition(u32_t_case_list[i]);
+        EXPECT_TRUE(result);
+    }
+    result =
+        biz_ptzf_if.setZoomPosition(u32_t_case_list[0], INVALID_SEQ_ID);
+    EXPECT_FALSE(result);
+}
+
+TEST_F(BizPtzfIfTest, setZoomPosition2Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    u32_t seq_id = U32_T(123456);
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+
+    ARRAY_FOREACH (u32_t_case_list, i) {
+        result =
+            biz_ptzf_if.setZoomPosition(u32_t_case_list[i], seq_id);
+        EXPECT_TRUE(result);
+    }
+}
+
+TEST_F(BizPtzfIfTest, setFocusPosition1Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+    ARRAY_FOREACH (u32_t_case_list, i) {
+        result = biz_ptzf_if.setFocusPosition(u32_t_case_list[i]);
+        EXPECT_TRUE(result);
+    }
+    result =
+        biz_ptzf_if.setFocusPosition(u32_t_case_list[0], INVALID_SEQ_ID);
+    EXPECT_FALSE(result);
+}
+
+TEST_F(BizPtzfIfTest, setFocusPosition2Way)
+{
+    EXPECT_CALL(er_mock_, create(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER)).Times(1).WillOnce(Return());
+
+    BizPtzfIf biz_ptzf_if;
+    u32_t seq_id = U32_T(123456);
+    bool result;
+
+    biz_ptzf_if.registNotification(reply_.getName());
+
+    ARRAY_FOREACH (u32_t_case_list, i) {
+        result =
+            biz_ptzf_if.setFocusPosition(u32_t_case_list[i], seq_id);
+        EXPECT_TRUE(result);
+    }
 }
 
 } // namespace

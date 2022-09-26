@@ -396,6 +396,7 @@ bool PtzfStatusInfraIf::getAFAreaPositionAFC(const u32_t preset_id, u16_t& posit
     PtzfStatusInfraIfMock& mock = pimpl_->mock_holder.getMock();
     return mock.getAFAreaPositionAFC(preset_id, position_x, position_y);
 }
+
 bool PtzfStatusInfraIf::getAFAreaPositionAFS(const u32_t preset_id, u16_t& position_x, u16_t& position_y)
 {
     PtzfStatusInfraIfMock& mock = pimpl_->mock_holder.getMock();

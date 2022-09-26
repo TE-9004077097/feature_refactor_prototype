@@ -16,15 +16,9 @@ namespace infra {
 class PtzfConfigInfraIf::Impl
 {
 public:
-    Impl() : mock_holder(MockHolder<PtzfConfigInfraIfMock>::instance())
+    Impl()
     {}
-
-    static bool pt_micon_power_on_complete_;
-
-    MockHolder<PtzfConfigInfraIfMock>& mock_holder;
 };
-
-bool PtzfConfigInfraIf::Impl::pt_micon_power_on_complete_ = false;
 
 PtzfConfigInfraIf::PtzfConfigInfraIf() : pimpl_(new Impl)
 {}
@@ -77,9 +71,9 @@ bool PtzfConfigInfraIf::setFocusPosition(const u32_t)
     return true;
 }
 
-void PtzfConfigInfraIf::setPtMiconPowerOnCompStatus(const bool is_complete)
+void PtzfConfigInfraIf::setPtMiconPowerOnCompStatus(const bool)
 {
-    PtzfConfigInfraIf::Impl::pt_micon_power_on_complete_ = is_complete;
+
 }
 
 } // namespace infra

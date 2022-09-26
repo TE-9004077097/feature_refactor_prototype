@@ -621,13 +621,6 @@ public:
         return zoom_infra_if.isClearImageZoomOn();
     }
 
-    void setPtMiconPowerOnCompStatus(const bool is_complete)
-    {
-        PtMiconPowerOnCompStatusParam param;
-        param.is_complete = is_complete;
-        visca::setBackupValue<PtMiconPowerOnCompStatusService>(param);
-    }
-
     void getPtMiconPowerOnCompStatus(bool& is_complete)
     {
         PtMiconPowerOnCompStatusParam param;

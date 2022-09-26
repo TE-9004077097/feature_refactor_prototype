@@ -34,10 +34,15 @@ if(CMAKE_CROSSCOMPILING)
       ptz_trace_status_infra_if_status_holder.cpp)
     cxx_static_library(ptzf_debug_info_infra_if "config_diadem_backup_if;visca_config_core;common_core" ptzf_debug_info_infra_if.cpp)
     list(APPEND ptzf_status_infra_if_sources ptzf_status_infra_if.cpp)
-    list(APPEND ptzf_config_infra_if_sources ptzf_config_infra_if.cpp)
     list(APPEND ptzf_status_infra_if_sources ptzf_status_infra_if_no_save_last_position.cpp)
     cxx_static_library(ptzf_status_infra_if "model_info_rc;visca_config_core;ptz_trace_status_backup_infra_if" ${ptzf_status_infra_if_sources})
-    cxx_static_library(ptzf_config_infra_if "model_info_rc;visca_config_core;ptz_trace_status_backup_infra_if" ${ptzf_config_infra_if_sources})
+    list(APPEND ptzf_config_infra_if_libs model_info_rc)
+    list(APPEND ptzf_config_infra_if_libs visca_config_core)
+    list(APPEND ptzf_config_infra_if_libs ptz_trace_status_backup_infra_if)
+    list(APPEND ptzf_config_infra_if_sources ptzf_config_infra_if.cpp)
+    cxx_static_library(ptzf_config_infra_if
+      "{ptzf_config_infra_if_libs}"
+      ${ptzf_config_infra_if_sources})
     cxx_static_library(ptzf_capability_infra_if "ptzf_status_infra_if;ptzf_config_infra_if" ptzf_capability_infra_if.cpp)
     cxx_static_library(ptzf_biz_message_infra_if
       "visca_config_core;common_core;visca_server_message_if"
@@ -53,15 +58,21 @@ if(CMAKE_CROSSCOMPILING)
       "model_info_rc;visca_config_core;ptz_trace_status_backup_infra_if"
       ptz_trace_status_infra_if.cpp
       ptz_trace_status_infra_if_status_holder.cpp)
-      list(APPEND ptzf_status_infra_if_sources ptzf_status_infra_if.cpp)
-      list(APPEND ptzf_status_infra_if_sources ptzf_config_infra_if.cpp)
-      if(APPRC_PANTILTT_INITIAL_POSITION_LAST_STOPPED)
-      list(APPEND ptzf_config_infra_if_sources ptzf_status_infra_if_save_last_position.cpp)
+    list(APPEND ptzf_status_infra_if_sources ptzf_status_infra_if.cpp)
+    if(APPRC_PANTILTT_INITIAL_POSITION_LAST_STOPPED)
+      list(APPEND ptzf_status_infra_if_sources ptzf_status_infra_if_save_last_position.cpp)
     else(APPRC_PANTILTT_INITIAL_POSITION_LAST_STOPPED)
       list(APPEND ptzf_status_infra_if_sources ptzf_status_infra_if_no_save_last_position.cpp)
     endif(APPRC_PANTILTT_INITIAL_POSITION_LAST_STOPPED)
     cxx_static_library(ptzf_status_infra_if "model_info_rc;visca_config_core;ptz_trace_status_backup_infra_if;ptzf_zoom_infra_if" ${ptzf_status_infra_if_sources})
-    cxx_static_library(ptzf_config_infra_if "model_info_rc;visca_config_core;ptz_trace_status_backup_infra_if;ptzf_zoom_infra_if" ${ptzf_config_infra_if_sources})
+    list(APPEND ptzf_config_infra_if_libs model_info_rc)
+    list(APPEND ptzf_config_infra_if_libs visca_config_core)
+    list(APPEND ptzf_config_infra_if_libs ptz_trace_status_backup_infra_if)
+    list(APPEND ptzf_config_infra_if_libs ptzf_zoom_infra_if)
+    list(APPEND ptzf_config_infra_if_sources ptzf_config_infra_if.cpp)
+    cxx_static_library(ptzf_config_infra_if
+      "${ptzf_config_infra_if_libs}"
+      ${ptzf_config_infra_if_sources})
     cxx_static_library(ptzf_biz_message_infra_if
       "visca_config_core;common_core;visca_server_message_if"
       ptzf_biz_message_infra_if.cpp)
@@ -81,7 +92,7 @@ if(CMAKE_CROSSCOMPILING)
       cxx_static_library(ptzf_if_clear_infra_if "ptzf_if_clear_infra_message_handler" ptzf_if_clear_infra_if_g8.cpp)
       cxx_static_library(ptzf_pan_tilt_lock_infra_if "" ptzf_pan_tilt_lock_infra_if_g8.cpp)
       cxx_static_library(ptzf_initialize_infra_message_handler
-          "visca_server_message_if;event_router_if;ptzf_status_if;ptzf_status;ptzf_config;error_notifier_message_if"
+          "visca_server_message_if;event_router_if;ptzf_status_if;ptzf_status;error_notifier_message_if"
           ptzf_initialize_infra_message_handler_g8.cpp
           sequence_id_controller.cpp)
       cxx_static_library(ptzf_finalize_infra_message_handler
@@ -133,7 +144,6 @@ if(CMAKE_CROSSCOMPILING)
       list(APPEND pan_tilt_initialize_infra_message_handler_dependencies event_router_if)
       list(APPEND pan_tilt_initialize_infra_message_handler_dependencies ptzf_status_if)
       list(APPEND pan_tilt_initialize_infra_message_handler_dependencies ptzf_status)
-      list(APPEND pan_tilt_initialize_infra_message_handler_dependencies ptzf_config)
       list(APPEND pan_tilt_initialize_infra_message_handler_dependencies error_notifier_message_if)
       list(APPEND pan_tilt_initialize_infra_message_handler_dependencies ptzf_ptp_accessor)
       list(APPEND pan_tilt_initialize_infra_message_handler_dependencies ptzf_pan_tilt_lock_infra_if)
@@ -200,10 +210,10 @@ else(CMAKE_CROSSCOMPILING)
   cxx_static_library(ptz_trace_status_backup_infra_if "" ptz_trace_status_backup_infra_if_fake.cpp)
   if(APPRC_CAMERA_PROTOCOL_VISCA)
     cxx_static_library(ptzf_initialize_infra_message_handler
-        "visca_server_message_if;event_router_if;ptzf_status_if;ptzf_status;ptzf_config;error_notifier_message_if"
+        "visca_server_message_if;event_router_if;ptzf_status_if;ptzf_status;error_notifier_message_if"
         ptzf_initialize_infra_message_handler_g8.cpp)
     cxx_static_library(ptzf_finalize_infra_message_handler
-        "visca_server_message_if;event_router_if;ptzf_status_if;ptzf_status;ptzf_config;error_notifier_message_if"
+        "visca_server_message_if;event_router_if;ptzf_status_if;ptzf_status;error_notifier_message_if"
         ptzf_finalize_infra_message_handler_g8.cpp)
     cxx_static_library(ptzf_pan_tilt_infra_message_handler
         "visca_server_message_if"
@@ -227,10 +237,10 @@ else(CMAKE_CROSSCOMPILING)
 #        ptzf_capability_infra_if_g8.cpp)
   else(APPRC_CAMERA_PROTOCOL_PTP)
     cxx_static_library(ptzf_initialize_infra_message_handler
-      "visca_server_message_if;event_router_if;ptzf_status_if;ptzf_status;ptzf_config;error_notifier_message_if"
+      "visca_server_message_if;event_router_if;ptzf_status_if;ptzf_status;error_notifier_message_if"
       ptzf_initialize_infra_message_handler_marco.cpp)
     cxx_static_library(ptzf_finalize_infra_message_handler
-      "visca_server_message_if;event_router_if;ptzf_status_if;ptzf_status;ptzf_config;error_notifier_message_if;ptzf_status_infra_if;ptzf_config_infra_if"
+      "visca_server_message_if;event_router_if;ptzf_status_if;ptzf_status;error_notifier_message_if;ptzf_status_infra_if;ptzf_config_infra_if"
       ptzf_finalize_infra_message_handler_marco.cpp)
     list(APPEND ptzf_pan_tilt_infra_message_handler_dependencies visca_server_message_if)
     cxx_static_library(ptzf_pan_tilt_infra_message_handler
@@ -286,23 +296,21 @@ cxx_gmock_executable(ptzf_status_infra_if_test
   ptzf_status_infra_if.cpp
 )
 
-#cxx_gmock_executable(ptzf_config_infra_if_test
-#  "model_info_rc;common_core;visca_config_core;ptzf_zoom_infra_if_mock"
-#  test/ptzf_status_infra_if_test.cpp
-#  ptzf_status_infra_if.cpp
-#)
+list(APPEND ptzf_config_infra_if_test_libs model_info_rc)
+list(APPEND ptzf_config_infra_if_test_libs common_core)
+list(APPEND ptzf_config_infra_if_test_libs visca_config_core)
+list(APPEND ptzf_config_infra_if_test_libs ptzf_zoom_infra_if_mock)
+cxx_gmock_executable(ptzf_config_infra_if_test
+  "${ptzf_config_infra_if_test_libs}"
+  test/ptzf_config_infra_if_test.cpp
+  ptzf_config_infra_if.cpp
+)
 
 cxx_gmock_executable(ptzf_status_infra_if_new_test
   "model_info_rc;common_core;visca_config_fake;ptzf_zoom_infra_if_mock"
   test/ptzf_status_infra_if_new_test.cpp
   ptzf_status_infra_if.cpp
 )
-
-#cxx_gmock_executable(ptzf_config_infra_if_new_test
-#  "model_info_rc;common_core;visca_config_fake;ptzf_zoom_infra_if_mock"
-#  test/ptzf_status_infra_if_new_test.cpp
-#  ptzf_status_infra_if.cpp
-#)
 
 if(APPRC_PANTILTT_INITIAL_POSITION_LAST_STOPPED)
   cxx_gmock_executable(ptzf_status_infra_if_save_last_position_test
@@ -321,10 +329,8 @@ else(APPRC_PANTILTT_INITIAL_POSITION_LAST_STOPPED)
 endif(APPRC_PANTILTT_INITIAL_POSITION_LAST_STOPPED)
 
 add_library_tests(ptzf_status_infra_if ptzf_status_infra_if_test)
-#add_library_tests(ptzf_config_infra_if ptzf_config_infra_if_test)
+add_library_tests(ptzf_config_infra_if ptzf_config_infra_if_test)
 add_library_tests(ptzf_status_infra_if ptzf_status_infra_if_new_test)
-#add_library_tests(ptzf_config_infra_if ptzf_config_infra_if_new_test)
-
 
 if(DIADEM_BUILD)
   cxx_gmock_executable(ptz_trace_backup_infra_meta_impl_test
@@ -420,7 +426,7 @@ elseif(G8_BUILD)
       ptzf_infra_controller_entry_g8.cpp)
 
     cxx_gmock_executable(ptzf_initialize_infra_if_test
-      "common_core;visca_server_message_if;ptzf_status;ptzf_config;ptzf_status_if;error_notifier_message_if"
+      "common_core;visca_server_message_if;ptzf_status;ptzf_status_if;error_notifier_message_if"
       test/ptzf_initialize_infra_if_g8_test.cpp
       ptzf_initialize_infra_if_g8.cpp
       ptzf_initialize_infra_message_handler_g8_fake.cpp
@@ -428,7 +434,7 @@ elseif(G8_BUILD)
     add_library_tests(ptzf_initialize_infra_if ptzf_initialize_infra_if_test)
 
     cxx_gmock_executable(ptzf_finalize_infra_if_test
-      "common_core;visca_server_message_if;ptzf_status;ptzf_config;ptzf_status_if;error_notifier_message_if"
+      "common_core;visca_server_message_if;ptzf_status;ptzf_status_if;error_notifier_message_if"
       test/ptzf_finalize_infra_if_g8_test.cpp
       ptzf_finalize_infra_if_g8.cpp
       ptzf_finalize_infra_message_handler_g8_fake.cpp
@@ -469,7 +475,6 @@ elseif(G8_BUILD)
     list(APPEND ptzf_initialize_infra_message_handler_libs ptz_trace_if_mock)
     list(APPEND ptzf_initialize_infra_message_handler_libs ptz_trace_status_if)
     list(APPEND ptzf_initialize_infra_message_handler_libs ptzf_status)
-    list(APPEND ptzf_initialize_infra_message_handler_libs ptzf_config)
     if(NOT CMAKE_CROSSCOMPILING)
       list(APPEND ptzf_initialize_infra_message_handler_libs ptzf_status_if_g8)
       list(APPEND ptzf_initialize_infra_message_handler_libs ptzf_config_if_g8)
@@ -557,7 +562,7 @@ elseif(G8_BUILD)
       ptzf_infra_controller_entry_marco.cpp)
 
     cxx_gmock_executable(ptzf_initialize_infra_if_test
-      "common_core;visca_server_message_if;ptzf_status;ptzf_config;ptzf_status_if;error_notifier_message_if;ptzf_pan_tilt_lock_infra_if"
+      "common_core;visca_server_message_if;ptzf_status;ptzf_status_if;error_notifier_message_if;ptzf_pan_tilt_lock_infra_if"
       test/ptzf_initialize_infra_if_marco_test.cpp
       ptzf_initialize_infra_if_marco.cpp
       ptzf_initialize_infra_message_handler_marco_fake.cpp
@@ -566,7 +571,7 @@ elseif(G8_BUILD)
     add_library_tests(ptzf_initialize_infra_if ptzf_initialize_infra_if_test)
 
     cxx_gmock_executable(ptzf_finalize_infra_if_test
-      "common_core;visca_server_message_if;ptzf_status;ptzf_config;ptzf_status_if;error_notifier_message_if"
+      "common_core;visca_server_message_if;ptzf_status;ptzf_status_if;error_notifier_message_if"
       test/ptzf_finalize_infra_if_marco_test.cpp
       ptzf_finalize_infra_if_marco.cpp
       ptzf_finalize_infra_message_handler_marco_fake.cpp
@@ -693,7 +698,6 @@ elseif(G8_BUILD)
     list(APPEND ptzf_initialize_infra_message_handler_libs ptz_trace_if_mock)
     list(APPEND ptzf_initialize_infra_message_handler_libs ptz_trace_status_if)
     list(APPEND ptzf_initialize_infra_message_handler_libs ptzf_status)
-    list(APPEND ptzf_initialize_infra_message_handler_libs ptzf_config)
     if(NOT CMAKE_CROSSCOMPILING)
       list(APPEND ptzf_initialize_infra_message_handler_libs ptzf_status_if_marco)
       list(APPEND ptzf_initialize_infra_message_handler_libs ptzf_config_if_marco)

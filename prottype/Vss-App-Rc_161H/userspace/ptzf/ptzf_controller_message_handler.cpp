@@ -289,9 +289,10 @@ PtzfControllerMessageHandler::PtzfControllerMessageHandler()
     recv_.setHandler(this, &PtzfControllerMessageHandler::handleRequest<PanTiltMoveRequest>);
     recv_.setHandler(this, &PtzfControllerMessageHandler::handleRequest<ZoomMoveRequest>);
     recv_.setHandler(this, &PtzfControllerMessageHandler::handleRequest<FocusModeRequest>);
-    recv_.setHandler(this, &PtzfControllerMessageHandler::handleRequest<SetAfTransitionSpeedRequest>);
-    recv_.setHandler(this, &PtzfControllerMessageHandler::handleRequest<SetAfSubjShiftSensRequest>);
-    recv_.setHandler(this, &PtzfControllerMessageHandler::handleRequest<SetFocusFaceEyeDetectionModeRequest>);
+    recv_.setHandler(this, &PtzfControllerMessageHandler::handleRequest<FocusModeValueRequest>);
+    recv_.setHandler(this, &PtzfControllerMessageHandler::handleRequest<SetAfTransitionSpeedValueRequest>);
+    recv_.setHandler(this, &PtzfControllerMessageHandler::handleRequest<SetAfSubjShiftSensValueRequest>);
+    recv_.setHandler(this, &PtzfControllerMessageHandler::handleRequest<SetFocusFaceEyeDetectionValueModeRequest>);
     recv_.setHandler(this, &PtzfControllerMessageHandler::handleRequest<FocusAreaRequest>);
     recv_.setHandler(this, &PtzfControllerMessageHandler::handleRequest<AFAreaPositionAFCRequest>);
     recv_.setHandler(this, &PtzfControllerMessageHandler::handleRequest<AFAreaPositionAFSRequest>);
@@ -707,95 +708,60 @@ void PtzfControllerMessageHandler::doHandleRequest(const FocusModeRequest& msg)
     }
 }
 
-void PtzfControllerMessageHandler::doHandleRequest(const SetAfTransitionSpeedRequest& msg)
+void PtzfControllerMessageHandler::doHandleRequest(const FocusModeValueRequest& msg)
+{
+    PTZF_VTRACE(msg.seq_id, msg.mode, 0);
+
+    config_if_.setFocusMode(msg.mode);
+}
+
+void PtzfControllerMessageHandler::doHandleRequest(const SetAfTransitionSpeedValueRequest& msg)
 {
     PTZF_VTRACE(msg.seq_id, msg.af_transition_speed, 0);
 
-    if (!msg.mq_name.isValid()) {
-        config_if_.setAfTransitionSpeed(msg.af_transition_speed);
-    }
-    else {
-        common::MessageQueue mq(msg.mq_name.name);
-        config_if_.setAfTransitionSpeed(msg.af_transition_speed);
-    }
+    config_if_.setAfTransitionSpeed(msg.af_transition_speed);
 }
 
-void PtzfControllerMessageHandler::doHandleRequest(const SetAfSubjShiftSensRequest& msg)
+void PtzfControllerMessageHandler::doHandleRequest(const SetAfSubjShiftSensValueRequest& msg)
 {
     PTZF_VTRACE(msg.seq_id, msg.af_subj_shift_sens, 0);
 
-    if (!msg.mq_name.isValid()) {
-        config_if_.setAfSubjShiftSens(msg.af_subj_shift_sens);
-    }
-    else {
-        common::MessageQueue mq(msg.mq_name.name);
-        config_if_.setAfSubjShiftSens(msg.af_subj_shift_sens);
-    }
+    config_if_.setAfSubjShiftSens(msg.af_subj_shift_sens);
 }
 
 void PtzfControllerMessageHandler::doHandleRequest(const FocusAreaRequest& msg)
 {
     PTZF_VTRACE(msg.seq_id, msg.focusarea, 0);
 
-    if (!msg.mq_name.isValid()) {
-        config_if_.setFocusArea(msg.focusarea);
-    }
-    else {
-        common::MessageQueue mq(msg.mq_name.name);
-        config_if_.setFocusArea(msg.focusarea);
-    }
+    config_if_.setFocusArea(msg.focusarea);
 }
 
 void PtzfControllerMessageHandler::doHandleRequest(const AFAreaPositionAFCRequest& msg)
 {
-    //PTZF_VTRACE(msg.seq_id, msg.position_x, msg.position_y, 0);
+    PTZF_VTRACE(msg.seq_id, msg.positionx, msg.positiony);
 
-    if (!msg.mq_name.isValid()) {
-        config_if_.setAFAreaPositionAFC(msg.positionx, msg.positiony);
-    }
-    else {
-        common::MessageQueue mq(msg.mq_name.name);
-        config_if_.setAFAreaPositionAFC(msg.positionx, msg.positiony);
-    }
+    config_if_.setAFAreaPositionAFC(msg.positionx, msg.positiony);
 }
 
 void PtzfControllerMessageHandler::doHandleRequest(const AFAreaPositionAFSRequest& msg)
 {
-    //PTZF_VTRACE(msg.seq_id, msg.position_x, msg.position_y, 0);
+    PTZF_VTRACE(msg.seq_id, msg.positionx, msg.positiony);
 
-    if (!msg.mq_name.isValid()) {
-        config_if_.setAFAreaPositionAFS(msg.positionx, msg.positiony);
-    }
-    else {
-        common::MessageQueue mq(msg.mq_name.name);
-        config_if_.setAFAreaPositionAFS(msg.positionx, msg.positiony);
-    }
+    config_if_.setAFAreaPositionAFS(msg.positionx, msg.positiony);
 }
 
 void PtzfControllerMessageHandler::doHandleRequest(const ZoomPositionRequest& msg)
 {
     PTZF_VTRACE(msg.seq_id, msg.pos, 0);
 
-    if (!msg.mq_name.isValid()) {
-        config_if_.setZoomPosition(msg.pos);
-    }
-    else {
-        common::MessageQueue mq(msg.mq_name.name);
-        config_if_.setZoomPosition(msg.pos);
-    }
+    config_if_.setZoomPosition(msg.pos);
 }
 
 void PtzfControllerMessageHandler::doHandleRequest(const FocusPositionRequest& msg)
 {
     PTZF_VTRACE(msg.seq_id, msg.pos, 0);
 
-    if (!msg.mq_name.isValid()) {
-        config_if_.setFocusPosition(msg.pos);
-    }
-    else {
-        common::MessageQueue mq(msg.mq_name.name);
-        config_if_.setFocusPosition(msg.pos);
-    }
+    config_if_.setFocusPosition(msg.pos);
 }
 
 void PtzfControllerMessageHandler::doHandleRequest(const FocusMoveRequest& msg)
@@ -1958,6 +1924,12 @@ void PtzfControllerMessageHandler::doHandleRequest(const SetFocusFaceEyeDetectio
 {
     PTZF_VTRACE(msg.seq_id, msg.focus_face_eye_detection_mode, 0);
     focus_infra_if_.setFocusFaceEyedetection(msg.focus_face_eye_detection_mode, msg.reply_name, msg.seq_id);
+}
+
+void PtzfControllerMessageHandler::doHandleRequest(const SetFocusFaceEyeDetectionValueModeRequest& msg)
+{
+    PTZF_VTRACE(msg.seq_id, msg.focus_face_eye_detection_mode, 0);
+    config_if_.setFocusFaceEyedetection(msg.focus_face_eye_detection_mode);
 }
 
 void PtzfControllerMessageHandler::doHandleRequest(const SetAfAssistRequest& msg)

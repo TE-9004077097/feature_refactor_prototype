@@ -312,9 +312,9 @@ bool convertTouchFunctionInMf(TouchFunctionInMf value, ptzf::TouchFunctionInMf& 
     return false;
 }
 
-bool convertFocusArea(const uint8_t value, ptzf::FocusArea & focusarea_value)
+bool convertFocusArea(const FocusArea value, ptzf::FocusArea& ptzf_value)
 {
-    static const struct convertFocusAreaTable
+    const struct ConvertFocusAreaTable
     {
         FocusArea biz_ptzf_value;
         ptzf::FocusArea ptzf_value;
@@ -331,7 +331,6 @@ bool convertFocusArea(const uint8_t value, ptzf::FocusArea & focusarea_value)
         }
     }
     return false;
-
 }
 
 static const struct ConvertPTZModeTable
@@ -764,6 +763,7 @@ public:
     bool setFocusNearLimit(const u16_t position, const u32_t seq_id);
     bool setFocusAFMode(const AFMode mode, const u32_t seq_id);
     bool setFocusFaceEyedetection(const FocusFaceEyeDetectionMode focus_face_eye_detection_mode, const u32_t seq_id);
+    bool setFocusFaceEyedetectionValue(const FocusFaceEyeDetectionMode focus_face_eye_detection_mode, const u32_t seq_id);
     bool setAfAssist(const bool on_off, const u32_t seq_id);
     bool setFocusTrackingPosition(const u16_t pos_x, const u16_t pos_y, const u32_t seq_id);
     bool setTouchFunctionInMf(const TouchFunctionInMf touch_function_in_mf, const u32_t seq_id);
@@ -793,14 +793,16 @@ public:
     bool setPTZTraceDelete(const u32_t trace_id, const u32_t seq_id);
     bool setStandbyMode(const StandbyMode standby_mode, const u32_t seq_id);
     bool setName(const TraceName& name, const u32_t seq_id);
-    bool setFocusMode(const uint8_t focus_mode, const u32_t seq_id);
-    bool setFocusArea(const uint8_t focus_area, const u32_t seq_id);
+    bool setFocusMode(const FocusMode focus_mode, const u32_t seq_id);
+    bool setFocusArea(const FocusArea focus_area, const u32_t seq_id);
     bool setAFAreaPositionAFC(const u16_t position_x, const u16_t position_y, const u32_t seq_id);
     bool setAFAreaPositionAFS(const u16_t position_x, const u16_t position_y, const u32_t seq_id);
     bool setZoomPosition(const u32_t position, const u32_t seq_id);
     bool setFocusPosition(const u32_t position, const u32_t seq_id);
     bool setAfSubjShiftSens(const uint8_t& af_subj_shift_sens, const u32_t seq_id);
+    bool setAfSubjShiftSensValue(const uint8_t& af_subj_shift_sens, const u32_t seq_id);
     bool setAfTransitionSpeed(const uint8_t& af_transition_speed, const u32_t seq_id);
+    bool setAfTransitionSpeedValue(const uint8_t& af_transition_speed, const u32_t seq_id);
     bool noticeCreateTraceThumbnailComp(const std::string file_path, const u32_t trace_id, const u32_t seq_id);
     bool noticeTraceThumbnailFileReceiveComp(const std::string file_path, const u32_t trace_id, const u32_t seq_id);
     bool deleteTraceThumbnail(const u32_t trace_id, const u32_t seq_id);
@@ -1265,6 +1267,21 @@ bool BizPtzfIf::BizPtzfIfImpl::setFocusFaceEyedetection(const FocusFaceEyeDetect
     return true;
 }
 
+bool BizPtzfIf::BizPtzfIfImpl::setFocusFaceEyedetectionValue(const FocusFaceEyeDetectionMode focus_face_eye_detection_mode,
+                                                        const u32_t seq_id)
+{
+    if (!isValidFocusCondition()) {
+        return false;
+    }
+    ptzf::FocusFaceEyeDetectionMode ptzf_mode = ptzf::FOCUS_FACE_EYE_DETECTION_MODE_FACE_EYE_ONLY;
+    if (!convertFocusFaceEyeDetectionMode(focus_face_eye_detection_mode, ptzf_mode)) {
+        return false;
+    }
+    ptzf::SetFocusFaceEyeDetectionValueModeRequest request(ptzf_mode, mq_name_, seq_id);
+    msg_if_.post(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER, request);
+    return true;
+}
+
 bool BizPtzfIf::BizPtzfIfImpl::setAfAssist(const bool on_off, const u32_t seq_id)
 {
     if (!isValidFocusCondition()) {
@@ -1507,22 +1524,33 @@ bool BizPtzfIf::BizPtzfIfImpl::setName(const TraceName& name, const u32_t seq_id
     return true;
 }
 
-bool BizPtzfIf::BizPtzfIfImpl::setFocusMode(const uint8_t focus_mode, const u32_t seq_id)
+bool BizPtzfIf::BizPtzfIfImpl::setFocusMode(const FocusMode focus_mode, const u32_t seq_id)
 {
     ptzf::FocusMode focusmode_value;
-	if(!convertFocusMode(focus_mode, focusmode_value)) {
+
+    if (!isValidSeqId(seq_id)) {
+        BIZ_PTZF_IF_TRACE_ERROR_RECORD();
         return false;
     }
 
-    ptzf::FocusModeRequest request(focusmode_value, seq_id, mq_name_);
+    if(!convertFocusMode(focus_mode, focusmode_value)) {
+        return false;
+    }
+    ptzf::FocusModeValueRequest request(focusmode_value, seq_id, mq_name_);
     msg_if_.post(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER, request);
     return true;
 }
-bool BizPtzfIf::BizPtzfIfImpl::setFocusArea(const uint8_t focus_area, const u32_t seq_id)
+
+bool BizPtzfIf::BizPtzfIfImpl::setFocusArea(const FocusArea focus_area, const u32_t seq_id)
 {
     ptzf::FocusArea focusarea_value;
-    if(!convertFocusArea(focus_area, focusarea_value))
-    {
+
+    if (!isValidSeqId(seq_id)) {
+        BIZ_PTZF_IF_TRACE_ERROR_RECORD();
+        return false;
+    }
+
+    if(!convertFocusArea(focus_area, focusarea_value)) {
         return false;
     }
 
@@ -1530,26 +1558,50 @@ bool BizPtzfIf::BizPtzfIfImpl::setFocusArea(const uint8_t focus_area, const u32_
     msg_if_.post(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER, request);
     return true;
 }
+
 bool BizPtzfIf::BizPtzfIfImpl::setAFAreaPositionAFC(const u16_t position_x, const u16_t position_y, const u32_t seq_id)
 {
+    if (!isValidSeqId(seq_id)) {
+        BIZ_PTZF_IF_TRACE_ERROR_RECORD();
+        return false;
+    }
+
     ptzf::AFAreaPositionAFCRequest request(position_x, position_y, seq_id, mq_name_);
     msg_if_.post(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER, request);
     return true;
 }
+
 bool BizPtzfIf::BizPtzfIfImpl::setAFAreaPositionAFS(const u16_t position_x, const u16_t position_y, const u32_t seq_id)
 {
+    if (!isValidSeqId(seq_id)) {
+        BIZ_PTZF_IF_TRACE_ERROR_RECORD();
+        return false;
+    }
+
     ptzf::AFAreaPositionAFSRequest request(position_x, position_y, seq_id, mq_name_);
     msg_if_.post(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER, request);
     return true;
 }
+
 bool BizPtzfIf::BizPtzfIfImpl::setZoomPosition(const u32_t position, const u32_t seq_id)
 {
+    if (!isValidSeqId(seq_id)) {
+        BIZ_PTZF_IF_TRACE_ERROR_RECORD();
+        return false;
+    }
+
     ptzf::ZoomPositionRequest request(position, seq_id, mq_name_);
     msg_if_.post(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER, request);
     return true;
 }
+
 bool BizPtzfIf::BizPtzfIfImpl::setFocusPosition(const u32_t position, const u32_t seq_id)
 {
+    if (!isValidSeqId(seq_id)) {
+        BIZ_PTZF_IF_TRACE_ERROR_RECORD();
+        return false;
+    }
+
     ptzf::FocusPositionRequest request(position, seq_id, mq_name_);
     msg_if_.post(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER, request);
     return true;
@@ -1570,6 +1622,19 @@ bool BizPtzfIf::BizPtzfIfImpl::setAfSubjShiftSens(const uint8_t& af_subj_shift_s
     return true;
 }
 
+bool BizPtzfIf::BizPtzfIfImpl::setAfSubjShiftSensValue(const uint8_t& af_subj_shift_sens, const u32_t seq_id)
+{
+    if (!isValidSeqId(seq_id)) {
+        BIZ_PTZF_IF_TRACE_ERROR_RECORD();
+        return false;
+    }
+
+    ptzf::SetAfSubjShiftSensValueRequest request(af_subj_shift_sens, seq_id, mq_name_);
+    msg_if_.post(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER, request);
+
+    return true;
+}
+
 bool BizPtzfIf::BizPtzfIfImpl::setAfTransitionSpeed(const uint8_t& af_transition_speed, const u32_t seq_id)
 {
     if (!isValidSeqId(seq_id)) {
@@ -1581,6 +1646,19 @@ bool BizPtzfIf::BizPtzfIfImpl::setAfTransitionSpeed(const uint8_t& af_transition
     payload.af_transition_speed = af_transition_speed;
     ptzf::BizMessage<ptzf::SetAfTransitionSpeedRequest> msg(seq_id, mq_name_, payload);
     msg_if_.post(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER, msg);
+
+    return true;
+}
+
+bool BizPtzfIf::BizPtzfIfImpl::setAfTransitionSpeedValue(const uint8_t& af_transition_speed, const u32_t seq_id)
+{
+    if (!isValidSeqId(seq_id)) {
+        BIZ_PTZF_IF_TRACE_ERROR_RECORD();
+        return false;
+    }
+
+    ptzf::SetAfTransitionSpeedValueRequest request(af_transition_speed, seq_id, mq_name_);
+    msg_if_.post(event_router::EVENT_ROUTER_TARGET_TYPE_PTZF_CONTROLLER, request);
 
     return true;
 }
@@ -2782,6 +2860,15 @@ bool BizPtzfIf::setFocusFaceEyedetection(const FocusFaceEyeDetectionMode focus_f
     return false;
 }
 
+bool BizPtzfIf::setFocusFaceEyedetectionValue(const FocusFaceEyeDetectionMode focus_face_eye_detection_mode,
+                                         const u32_t seq_id)
+{
+    if (INVALID_SEQ_ID != seq_id) {
+        return pimpl_->setFocusFaceEyedetectionValue(focus_face_eye_detection_mode, seq_id);
+    }
+    return false;
+}
+
 bool BizPtzfIf::setAfAssist(const bool on_off, const u32_t seq_id)
 {
     if (INVALID_SEQ_ID != seq_id) {
@@ -2945,12 +3032,12 @@ bool BizPtzfIf::setName(const TraceName& name, const u32_t seq_id)
     return pimpl_->setName(name, seq_id);
 }
 
-bool BizPtzfIf::setFocusMode(const uint8_t focus_mode, const u32_t seq_id)
+bool BizPtzfIf::setFocusMode(const FocusMode focus_mode, const u32_t seq_id)
 {
     return pimpl_->setFocusMode(focus_mode, seq_id);
 }
 
-bool BizPtzfIf::setFocusArea(const uint8_t focus_area, const u32_t seq_id)
+bool BizPtzfIf::setFocusArea(const FocusArea focus_area, const u32_t seq_id)
 {
     return pimpl_->setFocusArea(focus_area, seq_id);
 }
@@ -2980,9 +3067,19 @@ bool BizPtzfIf::setAfSubjShiftSens(const uint8_t& af_subj_shift_sens, const u32_
     return pimpl_->setAfSubjShiftSens(af_subj_shift_sens, seq_id);
 }
 
+bool BizPtzfIf::setAfSubjShiftSensValue(const uint8_t& af_subj_shift_sens, const u32_t seq_id)
+{
+    return pimpl_->setAfSubjShiftSensValue(af_subj_shift_sens, seq_id);
+}
+
 bool BizPtzfIf::setAfTransitionSpeed(const uint8_t& af_transition_speed, const u32_t seq_id)
 {
     return pimpl_->setAfTransitionSpeed(af_transition_speed, seq_id);
+}
+
+bool BizPtzfIf::setAfTransitionSpeedValue(const uint8_t& af_transition_speed, const u32_t seq_id)
+{
+    return pimpl_->setAfTransitionSpeedValue(af_transition_speed, seq_id);
 }
 
 bool BizPtzfIf::noticeCreateTraceThumbnailComp(const std::string file_path, const u32_t trace_id, const u32_t seq_id)

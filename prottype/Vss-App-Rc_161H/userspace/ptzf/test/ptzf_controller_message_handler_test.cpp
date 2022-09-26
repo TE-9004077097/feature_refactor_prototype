@@ -46,6 +46,7 @@
 #include "preset/preset_status_if_mock.h"
 #include "video/video_status_if_mock.h"
 #include "ptzf/ptzf_status_if_mock.h"
+#include "ptzf/ptzf_config_if_mock.h"
 #include "ptzf/ptz_trace_status_if_mock.h"
 #include "ptzf/ptz_trace_if_mock.h"
 
@@ -160,6 +161,24 @@ namespace ptzf {
 //   + PtzfZoomInfraIf::exeCancelZoomPosition()を呼び出すこと
 // + BizMessage<ExeCancelFocusPositionRequestForBiz>メッセージ受信処理のテスト
 //   + PtzfFocusInfraIf::exeCancelFocusPosition()を呼び出すこと
+// + FocusModeValueRequestメッセージ受信処理のテスト
+//   + PtzfConfigIf::setFocusMode()を呼び出すこと
+// + SetAfTransitionSpeedValueRequestメッセージ受信処理のテスト
+//   + PtzfConfigIf::setAfTransitionSpeed()を呼び出すこと
+// + SetAfSubjShiftSensValueRequestメッセージ受信処理のテスト
+//   + PtzfConfigIf::setAfSubjShiftSens()を呼び出すこと
+// + SetFocusFaceEyeDetectionValueModeRequestメッセージ受信処理のテスト
+//   + PtzfConfigIf::setFocusFaceEyedetection()を呼び出すこと
+// + FocusAreaRequestメッセージ受信処理のテスト
+//   + PtzfConfigIf::setFocusArea()を呼び出すこと
+// + AFAreaPositionAFCRequestメッセージ受信処理のテスト
+//   + PtzfConfigIf::setAFAreaPositionAFC()を呼び出すこと
+// + AFAreaPositionAFSRequestメッセージ受信処理のテスト
+//   + PtzfConfigIf::setAFAreaPositionAFS()を呼び出すこと
+// + ZoomPositionRequestメッセージ受信処理のテスト
+//   + PtzfConfigIf::setZoomPosition()を呼び出すこと
+// + FocusPositionRequestメッセージ受信処理のテスト
+//   + PtzfConfigIf::setFocusPosition()を呼び出すこと
 //
 //   上記のうち、(*)を付けたBizPtzfIf対応箇所について、以下のパターンの動作が行えること
 //     + 結果を通知するメッセージキュー名が未設定の場合
@@ -284,6 +303,8 @@ protected:
           zoom_infra_if_mock_(zoom_infra_if_mock_holder_object_.getMock()),
           focus_infra_if_mock_holder_object_(),
           focus_infra_if_mock_(focus_infra_if_mock_holder_object_.getMock()),
+          config_if_mock_holder_object_(),
+          config_if_mock_(config_if_mock_holder_object_.getMock()),
           if_clear_infra_if_mock_holder_object_(),
           if_clear_infra_if_mock_(if_clear_infra_if_mock_holder_object_.getMock()),
           pan_tilt_lock_infra_if_mock_holder_object_(),
@@ -424,6 +445,8 @@ protected:
     infra::PtzfZoomInfraIfMock& zoom_infra_if_mock_;
     MockHolderObject<infra::PtzfFocusInfraIfMock> focus_infra_if_mock_holder_object_;
     infra::PtzfFocusInfraIfMock& focus_infra_if_mock_;
+    MockHolderObject<ptzf::PtzfConfigIfMock> config_if_mock_holder_object_;
+    ptzf::PtzfConfigIfMock& config_if_mock_;
     MockHolderObject<infra::PtzfIfClearInfraIfMock> if_clear_infra_if_mock_holder_object_;
     infra::PtzfIfClearInfraIfMock& if_clear_infra_if_mock_;
     MockHolderObject<infra::PtzfPanTiltLockInfraIfMock> pan_tilt_lock_infra_if_mock_holder_object_;
@@ -6341,6 +6364,143 @@ TEST_F(PtzfControllerMessageHandlerTest, receiveUnlockToLockFollowingLockToUnloc
 
     const visca::CompReply visca_reply_initialize(ERRORCODE_SUCCESS, seq_id_list[2]);
     handler_->handleRequest(visca_reply_initialize);
+}
+
+TEST_F(PtzfControllerMessageHandlerTest, FocusModeValue)
+{
+    FocusModeValueRequest msg;
+    common::MessageQueueName blankName;
+
+    gtl::copyString(blankName.name, "");
+    msg.mode = FOCUS_MODE_AUTO;
+    msg.seq_id = U32_T(123456);
+    msg.mq_name = blankName;
+
+    EXPECT_CALL(config_if_mock_, setFocusMode(_)).Times(1);
+
+    handler_->handleRequest(msg);
+}
+
+TEST_F(PtzfControllerMessageHandlerTest, AfTransitionSpeedValue)
+{
+    SetAfTransitionSpeedValueRequest msg;
+    common::MessageQueueName blankName;
+
+    gtl::copyString(blankName.name, "");
+    msg.seq_id = U32_T(123456);
+    msg.mq_name = blankName;
+    msg.af_transition_speed = 0x01;
+
+    EXPECT_CALL(config_if_mock_, setAfTransitionSpeed(_))
+        .Times(1);
+    handler_->handleRequest(msg);
+}
+
+TEST_F(PtzfControllerMessageHandlerTest, AfSubjShiftSensValue)
+{
+    SetAfSubjShiftSensValueRequest msg;
+    common::MessageQueueName blankName;
+
+    gtl::copyString(blankName.name, "");
+    msg.seq_id = U32_T(123456);
+    msg.mq_name = blankName;
+    msg.af_subj_shift_sens = 0x01;
+
+    EXPECT_CALL(config_if_mock_, setAfSubjShiftSens(_))
+        .Times(1);
+    handler_->handleRequest(msg);
+}
+
+TEST_F(PtzfControllerMessageHandlerTest, FocusFaceEyedetectionValueSuccess)
+{
+    SetFocusFaceEyeDetectionValueModeRequest msg;
+    common::MessageQueueName blankName;
+
+    gtl::copyString(blankName.name, "");
+    msg.seq_id = U32_T(123456);
+    msg.reply_name = blankName;
+    msg.focus_face_eye_detection_mode = FOCUS_FACE_EYE_DETECTION_MODE_FACE_EYE_ONLY;
+
+    EXPECT_CALL(config_if_mock_, setFocusFaceEyedetection(_))
+        .Times(1);
+    handler_->handleRequest(msg);
+}
+
+TEST_F(PtzfControllerMessageHandlerTest, FocusArea)
+{
+    FocusAreaRequest msg;
+    common::MessageQueueName blankName;
+
+    gtl::copyString(blankName.name, "");
+    msg.seq_id = U32_T(123456);
+    msg.mq_name = blankName;
+    msg.focusarea = FOCUS_AREA_WIDE;
+
+    EXPECT_CALL(config_if_mock_, setFocusArea(_)).Times(1);
+
+    handler_->handleRequest(msg);
+}
+
+TEST_F(PtzfControllerMessageHandlerTest, AFAreaPositionAFC)
+{
+    AFAreaPositionAFCRequest msg;
+    common::MessageQueueName blankName;
+
+    gtl::copyString(blankName.name, "");
+    msg.positionx = U16_T(0);
+    msg.positiony = U16_T(0);
+    msg.seq_id = U32_T(123456);
+    msg.mq_name = blankName;
+
+    EXPECT_CALL(config_if_mock_, setAFAreaPositionAFC(_, _)).Times(1);
+
+    handler_->handleRequest(msg);
+}
+
+TEST_F(PtzfControllerMessageHandlerTest, AFAreaPositionAFS)
+{
+    AFAreaPositionAFSRequest msg;
+    common::MessageQueueName blankName;
+
+    gtl::copyString(blankName.name, "");
+    msg.positionx = U16_T(0);
+    msg.positiony = U16_T(0);
+    msg.seq_id = U32_T(123456);
+    msg.mq_name = blankName;
+
+    EXPECT_CALL(config_if_mock_, setAFAreaPositionAFS(_, _)).Times(1);
+
+    handler_->handleRequest(msg);
+}
+
+TEST_F(PtzfControllerMessageHandlerTest, setZoomPosition)
+{
+    ZoomPositionRequest msg;
+    common::MessageQueueName blankName;
+
+    gtl::copyString(blankName.name, "");
+    msg.pos = U32_T(0);
+    msg.seq_id = U32_T(123456);
+    msg.mq_name = blankName;
+
+    EXPECT_CALL(config_if_mock_, setZoomPosition(_)).Times(1);
+
+    handler_->handleRequest(msg);
+}
+
+TEST_F(PtzfControllerMessageHandlerTest, setFocusPosition)
+{
+    FocusPositionRequest msg;
+    common::MessageQueueName blankName;
+
+    gtl::copyString(blankName.name, "");
+    msg.pos = U32_T(0);
+    msg.seq_id = U32_T(123456);
+    msg.mq_name = blankName;
+
+    EXPECT_CALL(config_if_mock_, setFocusPosition(_)).Times(1);
+
+    handler_->handleRequest(msg);
 }
 
 #pragma GCC diagnostic warning "-Wconversion"

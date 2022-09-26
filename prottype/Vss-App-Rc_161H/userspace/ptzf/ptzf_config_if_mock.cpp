@@ -8,12 +8,8 @@
 
 #include "ptzf/ptzf_config_if.h"
 #include "ptzf/ptzf_config_if_mock.h"
-#include "visca/dboutputs/enum.h"
 
-#include "gmock/gmock.h"
 #include "common_gmock_util.h"
-#include "biz_ptzf_if.h"
-#include "ptzf/ptzf_common_message.h"
 
 namespace ptzf {
 
@@ -90,6 +86,5 @@ void PtzfConfigIf::setPtMiconPowerOnCompStatus(const bool is_complete) const
     PtzfConfigIfMock& mock = pimpl_->mock_holder.getMock();
     return mock.setPtMiconPowerOnCompStatus(is_complete);
 }
-
 
 } // namespace ptzf

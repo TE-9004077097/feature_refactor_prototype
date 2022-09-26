@@ -13,7 +13,6 @@
 #include "common_timer.h"
 #include "common_message_queue.h"
 #include "preset_infra_message.h"
-#include "ptzf/ptzf_status_if.h"
 #include "biz_ptzf_if.h"
 #include "ptp/driver/ptp_driver_command_if.h"
 #include "ptp/driver/ptp_driver_if_message.h"
@@ -83,7 +82,6 @@ private:
     ptp::driver::PtpDriverCommandIf ptp_driver_if_;
     common::Select& select_;
     common::MessageQueue mq_;
-    ptzf::PtzfStatusIf ptzf_status_if_;
     biz_ptzf::BizPtzfIf biz_ptzf_if_;
     uint32_t set_preset_id_;
     common::MessageQueueName set_reply_mq_name_;

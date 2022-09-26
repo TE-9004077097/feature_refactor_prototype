@@ -3,23 +3,8 @@
  *
  * Copyright 2022 Sony Coporation
  */
-
-#include "types.h"
-
 #include "ptzf/ptzf_config_if.h"
-
-#include "visca/dboutputs/config_pan_tilt_service.h"
-#include "visca/dboutputs/config_remote_camera_service.h"
-#include "visca/dboutputs/config_camera_service.h"
-#include "visca/dboutputs/enum.h"
-#include "visca/tally_mode_notifier.h"
-#include "preset/preset_status_if.h"
-#include "ptzf_trace.h"
-#include "visca/dboutputs/config_remote_camera2_service.h"
-
 #include "ptzf_config_infra_if.h"
-#include "ptzf_backup_infra_if.h"
-#include "pan_tilt_value_manager.h"
 
 namespace ptzf {
 

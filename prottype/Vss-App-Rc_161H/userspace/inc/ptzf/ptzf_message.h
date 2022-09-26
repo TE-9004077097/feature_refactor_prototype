@@ -146,15 +146,37 @@ struct FocusModeRequest
     {}
 };
 
+struct FocusModeValueRequest
+{
+    FocusMode mode;
+    u32_t seq_id;
+    common::MessageQueueName mq_name;
+
+    FocusModeValueRequest() : mode(FOCUS_MODE_AUTO), seq_id(INVALID_SEQ_ID), mq_name()
+    {}
+
+    explicit FocusModeValueRequest(const FocusMode mod) : mode(mod), seq_id(INVALID_SEQ_ID), mq_name()
+    {}
+
+    FocusModeValueRequest(const FocusMode mod, const u32_t id, const common::MessageQueueName name)
+        : mode(mod),
+          seq_id(id),
+          mq_name(name)
+    {}
+};
+
 struct FocusAreaRequest
 {
     FocusArea focusarea;
     u32_t seq_id;
     common::MessageQueueName mq_name;
+
     FocusAreaRequest() : focusarea(FOCUS_AREA_WIDE), seq_id(INVALID_SEQ_ID), mq_name()
     {}
+
     explicit FocusAreaRequest(const FocusArea area) : focusarea(area), seq_id(INVALID_SEQ_ID), mq_name()
     {}
+
     FocusAreaRequest(const FocusArea area, const u32_t id, const common::MessageQueueName name)
         : focusarea(area),
           seq_id(id),
@@ -168,11 +190,14 @@ struct AFAreaPositionAFCRequest
     u16_t positiony;
     u32_t seq_id;
     common::MessageQueueName mq_name;
+
     AFAreaPositionAFCRequest() : positionx(0), positiony(0), seq_id(INVALID_SEQ_ID), mq_name()
     {}
-   explicit AFAreaPositionAFCRequest(const u16_t x, const u16_t y) : positionx(x), positiony(y), seq_id(INVALID_SEQ_ID), mq_name()
+
+    explicit AFAreaPositionAFCRequest(const u16_t x, const u16_t y) : positionx(x), positiony(y), seq_id(INVALID_SEQ_ID), mq_name()
     {}
-   AFAreaPositionAFCRequest(const u16_t x, const u16_t y, const u32_t id, const common::MessageQueueName name)
+
+    AFAreaPositionAFCRequest(const u16_t x, const u16_t y, const u32_t id, const common::MessageQueueName name)
         : positionx(x),
           positiony(y),
           seq_id(id),
@@ -186,11 +211,14 @@ struct AFAreaPositionAFSRequest
     u16_t positiony;
     u32_t seq_id;
     common::MessageQueueName mq_name;
+
     AFAreaPositionAFSRequest() : positionx(0), positiony(0), seq_id(INVALID_SEQ_ID), mq_name()
     {}
-   explicit AFAreaPositionAFSRequest(const u16_t x, const u16_t y) : positionx(x), positiony(y), seq_id(INVALID_SEQ_ID), mq_name()
+
+    explicit AFAreaPositionAFSRequest(const u16_t x, const u16_t y) : positionx(x), positiony(y), seq_id(INVALID_SEQ_ID), mq_name()
     {}
-   AFAreaPositionAFSRequest(const u16_t x, const u16_t y, const u32_t id, const common::MessageQueueName name)
+
+    AFAreaPositionAFSRequest(const u16_t x, const u16_t y, const u32_t id, const common::MessageQueueName name)
         : positionx(x),
           positiony(y),
           seq_id(id),
@@ -203,10 +231,13 @@ struct ZoomPositionRequest
     u32_t pos;
     u32_t seq_id;
     common::MessageQueueName mq_name;
+
     ZoomPositionRequest() : pos(0), seq_id(INVALID_SEQ_ID), mq_name()
     {}
-   explicit ZoomPositionRequest(const u32_t position) : pos(position), seq_id(INVALID_SEQ_ID), mq_name()
+
+    explicit ZoomPositionRequest(const u32_t position) : pos(position), seq_id(INVALID_SEQ_ID), mq_name()
     {}
+
     ZoomPositionRequest(const u32_t position, const u32_t id, const common::MessageQueueName name)
         : pos(position),
           seq_id(id),
@@ -219,17 +250,19 @@ struct FocusPositionRequest
     u32_t pos;
     u32_t seq_id;
     common::MessageQueueName mq_name;
+
     FocusPositionRequest() : pos(0), seq_id(INVALID_SEQ_ID), mq_name()
     {}
-   explicit FocusPositionRequest(const u32_t position) : pos(position), seq_id(INVALID_SEQ_ID), mq_name()
+
+    explicit FocusPositionRequest(const u32_t position) : pos(position), seq_id(INVALID_SEQ_ID), mq_name()
     {}
+
     FocusPositionRequest(const u32_t position, const u32_t id, const common::MessageQueueName name)
         : pos(position),
           seq_id(id),
           mq_name(name)
     {}
 };
-
 
 struct FocusMoveRequest
 {
@@ -860,6 +893,27 @@ struct SetFocusFaceEyeDetectionModeRequest
     {}
 };
 
+struct SetFocusFaceEyeDetectionValueModeRequest
+{
+    FocusFaceEyeDetectionMode focus_face_eye_detection_mode;
+    common::MessageQueueName reply_name;
+    u32_t seq_id;
+
+    SetFocusFaceEyeDetectionValueModeRequest()
+        : focus_face_eye_detection_mode(FOCUS_FACE_EYE_DETECTION_MODE_FACE_EYE_ONLY),
+          reply_name(),
+          seq_id(INVALID_SEQ_ID)
+    {}
+
+    SetFocusFaceEyeDetectionValueModeRequest(const FocusFaceEyeDetectionMode focus_face_eye_detection_mode_local,
+                                        const common::MessageQueueName name,
+                                        const u32_t id)
+        : focus_face_eye_detection_mode(focus_face_eye_detection_mode_local),
+          reply_name(name),
+          seq_id(id)
+    {}
+};
+
 struct SetAfAssistRequest
 {
     bool on_off;
@@ -1211,6 +1265,28 @@ struct SetAfSubjShiftSensRequest
     {}
 };
 
+struct SetAfSubjShiftSensValueRequest
+{
+    uint8_t af_subj_shift_sens;
+    u32_t seq_id;
+    common::MessageQueueName mq_name;
+
+    SetAfSubjShiftSensValueRequest() : af_subj_shift_sens(0x01), seq_id(INVALID_SEQ_ID), mq_name()
+    {}
+    explicit SetAfSubjShiftSensValueRequest(const uint8_t af_subj_shift_sens_local)
+        : af_subj_shift_sens(af_subj_shift_sens_local),
+          seq_id(INVALID_SEQ_ID),
+          mq_name()
+    {}
+    SetAfSubjShiftSensValueRequest(const uint8_t af_subj_shift_sens_local,
+                              const u32_t id,
+                              const common::MessageQueueName name)
+        : af_subj_shift_sens(af_subj_shift_sens_local),
+          seq_id(id),
+          mq_name(name)
+    {}
+};
+
 struct SetAfTransitionSpeedRequest
 {
     uint8_t af_transition_speed;
@@ -1225,6 +1301,28 @@ struct SetAfTransitionSpeedRequest
           mq_name()
     {}
     SetAfTransitionSpeedRequest(const uint8_t af_transition_speed_local,
+                                const u32_t id,
+                                const common::MessageQueueName name)
+        : af_transition_speed(af_transition_speed_local),
+          seq_id(id),
+          mq_name(name)
+    {}
+};
+
+struct SetAfTransitionSpeedValueRequest
+{
+    uint8_t af_transition_speed;
+    u32_t seq_id;
+    common::MessageQueueName mq_name;
+
+    SetAfTransitionSpeedValueRequest() : af_transition_speed(0x01), seq_id(INVALID_SEQ_ID), mq_name()
+    {}
+    explicit SetAfTransitionSpeedValueRequest(const uint8_t af_transition_speed_local)
+        : af_transition_speed(af_transition_speed_local),
+          seq_id(INVALID_SEQ_ID),
+          mq_name()
+    {}
+    SetAfTransitionSpeedValueRequest(const uint8_t af_transition_speed_local,
                                 const u32_t id,
                                 const common::MessageQueueName name)
         : af_transition_speed(af_transition_speed_local),

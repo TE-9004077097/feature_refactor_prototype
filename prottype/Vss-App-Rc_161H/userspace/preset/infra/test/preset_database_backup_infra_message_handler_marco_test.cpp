@@ -4,8 +4,6 @@
  * Copyright 2021 Sony Corporation
  */
 
-//#define TEST_STATUS
-
 #include "gtl_memory.h"
 #include "gtl_string.h"
 #include "gtest/gtest.h"
@@ -19,7 +17,7 @@
 #include "ptp/driver/ptp_driver_command_if_mock.h"
 #include "ptp/ptp_device_property.h"
 #include "ptp/ptp_error.h"
-#include "ptzf/ptzf_status_if_mock.h"
+#include "biz_ptzf_if_mock.h"
 #include "ptp/ptp_command_data.h"
 #include "visca/visca_server_message_if_mock.h"
 #include "visca/visca_server_ptzf_if_mock.h"
@@ -60,7 +58,7 @@ protected:
         : ptp_driver_if_mock_holder_(),
           ptp_driver_if_mock_(ptp_driver_if_mock_holder_.getMock()),
           ptzf_mock_holder_object_(),
-          ptzf_status_if_mock_(ptzf_mock_holder_object_.getMock()),
+          biz_ptzf_if_mock_(ptzf_mock_holder_object_.getMock()),
           visca_ptzf_if_mock_holder_object(),
           visca_ptzf_if_mock_(visca_ptzf_if_mock_holder_object.getMock()),
           visca_if_mock_holder_object(),
@@ -82,43 +80,42 @@ protected:
         config_mq.unlink();
         reply_.unlink();
     }
-#ifdef TEST_STATUS
-    //TODO テスト未実装。実装時は恐らく以下を実行。（その際、ptzf_config_if_mock_は適切な値に書き換える）
+
     void setPtzfStatusParameters()
     {
         // SetFocusMode
-        EXPECT_CALL(ptzf_config_if_mock_, setFocusMode(_)).Times(1).WillOnce(Return());
+        EXPECT_CALL(biz_ptzf_if_mock_, setFocusMode(_, _)).Times(1).WillOnce(Return(true));
 
         // SetAfTransitionSpeed
-        EXPECT_CALL(ptzf_config_if_mock_, setAfTransitionSpeed(_)).Times(1).WillOnce(Return());
+        EXPECT_CALL(biz_ptzf_if_mock_, setAfTransitionSpeedValue(_, _)).Times(1).WillOnce(Return(true));
 
         // SetAfSubjShiftSens
-        EXPECT_CALL(ptzf_config_if_mock_, setAfSubjShiftSens(_)).Times(1).WillOnce(Return());
+        EXPECT_CALL(biz_ptzf_if_mock_, setAfSubjShiftSensValue(_, _)).Times(1).WillOnce(Return(true));
 
         // SetFocusFaceEyedetection
-        EXPECT_CALL(ptzf_config_if_mock_, setFocusFaceEyedetection(_)).Times(1).WillOnce(Return());
+        EXPECT_CALL(biz_ptzf_if_mock_, setFocusFaceEyedetectionValue(_, _)).Times(1).WillOnce(Return(true));
 
         // SetFocusArea
-        EXPECT_CALL(ptzf_config_if_mock_, setFocusArea(_)).Times(1).WillOnce(Return());
+        EXPECT_CALL(biz_ptzf_if_mock_, setFocusArea(_, _)).Times(1).WillOnce(Return(true));
 
         // SetAFAreaPositionAFC
-        EXPECT_CALL(ptzf_config_if_mock_, setAFAreaPositionAFC(_, _)).Times(1).WillOnce(Return());
+        EXPECT_CALL(biz_ptzf_if_mock_, setAFAreaPositionAFC(_, _, _)).Times(1).WillOnce(Return(true));
 
         // SetAFAreaPositionAFS
-        EXPECT_CALL(ptzf_config_if_mock_, setAFAreaPositionAFS(_, _)).Times(1).WillOnce(Return());
+        EXPECT_CALL(biz_ptzf_if_mock_, setAFAreaPositionAFS(_, _, _)).Times(1).WillOnce(Return(true));
 
         // SetZoomPosition
-        EXPECT_CALL(ptzf_config_if_mock_, setZoomPosition(_)).Times(1).WillOnce(Return());
+        EXPECT_CALL(biz_ptzf_if_mock_, setZoomPosition(_, _)).Times(1).WillOnce(Return(true));
 
         // SetFocusPosition
-        EXPECT_CALL(ptzf_config_if_mock_, setFocusPosition(_)).Times(1).WillOnce(Return());
+        EXPECT_CALL(biz_ptzf_if_mock_, setFocusPosition(_, _)).Times(1).WillOnce(Return(true));
     }
-#endif
+
 protected:
     MockHolderObject<ptp::driver::PtpDriverCommandIfMock> ptp_driver_if_mock_holder_;
     ptp::driver::PtpDriverCommandIfMock& ptp_driver_if_mock_;
-    MockHolderObject<ptzf::PtzfStatusIfMock> ptzf_mock_holder_object_;
-    ptzf::PtzfStatusIfMock& ptzf_status_if_mock_;
+    MockHolderObject<biz_ptzf::BizPtzfIfMock> ptzf_mock_holder_object_;
+    biz_ptzf::BizPtzfIfMock& biz_ptzf_if_mock_;
     MockHolderObject<visca::ViscaServerPtzfIfMock> visca_ptzf_if_mock_holder_object;
     visca::ViscaServerPtzfIfMock& visca_ptzf_if_mock_;
     MockHolderObject<visca::ViscaServerMessageIfMock> visca_if_mock_holder_object;
@@ -129,11 +126,8 @@ protected:
 
 TEST_F(PresetDatabaseBackupInfraMessageHandlerTest, setPresetSuccess)
 {
-
-    #ifdef TEST_STATUS
-        // PtzfStatusIf
-        setPtzfStatusParameters();
-    #endif
+    // PtzfStatusIf
+    setPtzfStatusParameters();
 
     // GetFocusMode
     u32_t dp_code = ptp::CR_DEVICE_PROPERTY_FOCUS_MODE_SETTING;
@@ -208,10 +202,8 @@ TEST_F(PresetDatabaseBackupInfraMessageHandlerTest, setPresetSuccess)
 
 TEST_F(PresetDatabaseBackupInfraMessageHandlerTest, setPresetZoomPositionFailure)
 {
-    #ifdef TEST_STATUS
-        // PtzfStatusIf
-        setPtzfStatusParameters();
-    #endif
+    // PtzfStatusIf
+    setPtzfStatusParameters();
 
     // GetFocusMode
     u32_t dp_code = ptp::CR_DEVICE_PROPERTY_FOCUS_MODE_SETTING;
@@ -286,10 +278,8 @@ TEST_F(PresetDatabaseBackupInfraMessageHandlerTest, setPresetZoomPositionFailure
 
 TEST_F(PresetDatabaseBackupInfraMessageHandlerTest, setPresetFocusCommandFailure)
 {
-    #ifdef TEST_STATUS
-        // PtzfStatusIf
-        setPtzfStatusParameters();
-    #endif
+    // PtzfStatusIf
+    setPtzfStatusParameters();
 
     // GetFocusMode
     u32_t dp_code = ptp::CR_DEVICE_PROPERTY_FOCUS_MODE_SETTING;
@@ -364,10 +354,9 @@ TEST_F(PresetDatabaseBackupInfraMessageHandlerTest, setPresetFocusCommandFailure
 
 TEST_F(PresetDatabaseBackupInfraMessageHandlerTest, setPresetAllCommandFailure)
 {
-    #ifdef TEST_STATUS
-        // PtzfStatusIf
-        setPtzfStatusParameters();
-    #endif
+    // PtzfStatusIf
+    setPtzfStatusParameters();
+
     // GetFocusMode
     u32_t dp_code = ptp::CR_DEVICE_PROPERTY_FOCUS_MODE_SETTING;
     uint64_t value = U8_T(1);
